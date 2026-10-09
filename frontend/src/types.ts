@@ -18,6 +18,7 @@ export interface Photo {
   width: number
   height: number
   taken_at: string | null
+  tz_offset: string | null
   place_name: string | null
   has_location: boolean
 }

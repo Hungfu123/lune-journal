@@ -31,3 +31,13 @@ export function shortDate(iso: string): string {
   const [yy, mm, dd] = iso.split('-').map(Number)
   return new Date(yy, mm - 1, dd).toLocaleDateString('de-DE', { day: 'numeric', month: 'short' })
 }
+
+/** Aufnahmezeitpunkt eines Fotos, in der Zeit des Aufnahmeorts. */
+export function photoMoment(takenAt: string, tzOffset: string | null): string {
+  // taken_at ist bereits Ortszeit; ohne Z anhängen, sonst rechnet der Browser um
+  const d = new Date(takenAt.replace(/Z$/, ''))
+  if (Number.isNaN(d.getTime())) return ''
+  const datum = d.toLocaleDateString('de-DE', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })
+  const zeit = d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
+  return `${datum}, ${zeit} Uhr${tzOffset ? ` (UTC${tzOffset})` : ''}`
+}

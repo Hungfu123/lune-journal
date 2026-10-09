@@ -50,7 +50,7 @@ export default function Timeline({ me, onMeChange }: { me: Me; onMeChange: (m: M
   const desktop = useIsDesktop()
   const composer = useRef<ComposerHandle>(null)
   const wide = useMedia('(min-width: 1280px)')
-  const [lightbox, setLightbox] = useState<{ photos: Photo[]; index: number; caption: string } | null>(null)
+  const [lightbox, setLightbox] = useState<{ photos: Photo[]; index: number; caption: string; entry?: Entry } | null>(null)
   const startWriting = () => (desktop ? composer.current?.focus() : setNewOpen(true))
   const [monthOpen, setMonthOpen] = useState(false)
   const [shared, setShared] = useState<SharedContent | null>(null)
@@ -297,7 +297,7 @@ export default function Timeline({ me, onMeChange }: { me: Me; onMeChange: (m: M
         )}
         {feed.map((item) =>
           item.kind === 'entry' ? (
-            <EntryCard key={`e${item.entry.id}`} entry={item.entry} fresh={freshIds.has(item.entry.id)} highlight={item.entry.id === highlightId} onHeart={heart} onDelete={remove} onOpenPhoto={(entry, index) => setLightbox({ photos: entry.photos, index, caption: `${entry.author.name}, ${dayLabel(entry.date)}` })} />
+            <EntryCard key={`e${item.entry.id}`} entry={item.entry} fresh={freshIds.has(item.entry.id)} highlight={item.entry.id === highlightId} onHeart={heart} onDelete={remove} onOpenPhoto={(entry, index) => setLightbox({ photos: entry.photos, index, caption: `${entry.author.name}, ${dayLabel(entry.date)}`, entry })} />
           ) : (
             <QACard key={`q${item.q.id}`} q={item.q} me={me} fresh={item.q.id === freshQ} />
           ),
@@ -334,7 +334,7 @@ export default function Timeline({ me, onMeChange }: { me: Me; onMeChange: (m: M
 
       {!desktop && <NewEntrySheet open={newOpen} onOpenChange={setNewOpen} onPosted={posted} shared={shared} askPlace={me.ask_place} />}
       {lightbox && (
-        <Lightbox photos={lightbox.photos} start={lightbox.index} caption={lightbox.caption} onClose={() => setLightbox(null)} />
+        <Lightbox photos={lightbox.photos} start={lightbox.index} caption={lightbox.caption} entry={lightbox.entry} onClose={() => setLightbox(null)} />
       )}
       <AskSheet
         open={askOpen}
