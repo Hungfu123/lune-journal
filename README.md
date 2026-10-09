@@ -42,6 +42,10 @@ euer Monat in Zahlen und eine Fotowand.
 Druckqualität, optional 3 mm Beschnitt für die Druckerei. Mit Cover, Inhaltsverzeichnis, Monatsseiten,
 Fragen und Jahresrückblick. Vorher durchblättern, dann teilen oder drucken.
 
+**Standort nur, wenn er passt.** Hängen Fotos am Eintrag, holt die App auf Wunsch einmal euren Standort —
+praktisch, weil geteilte Fotos ihre Koordinaten oft verlieren. Ein Eintrag aus reinem Text bleibt unberührt.
+Orte lassen sich mit Spitznamen versehen: dann steht dort „Zuhause" statt der Straße.
+
 **Fotos aus jeder App hereinreichen.** Lune Journal steht im Teilen-Menü eurer Pixel: in Google Fotos
 (auch in einem gemeinsamen Album), WhatsApp oder der Galerie die Bilder markieren, *Teilen* → *Lune Journal*.
 Der Eintrag geht auf, die Fotos hängen schon dran. Dafür muss die App auf dem Handy installiert sein.

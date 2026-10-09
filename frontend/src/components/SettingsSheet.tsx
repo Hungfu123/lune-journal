@@ -91,8 +91,9 @@ export default function SettingsSheet({ open, onOpenChange, me, onMeChange }: Pr
               <span>
                 <strong>Standort automatisch mitgeben</strong>
                 <small>
-                  Beim Schreiben holt die App einmal euren Standort und hängt ihn an den Eintrag. So taucht er
-                  auf der Karte auf, auch wenn das Foto keine Koordinaten mitbringt.
+                  Sobald Fotos am Eintrag hängen, holt die App einmal euren Standort — so landet der Eintrag
+                  auf der Karte, auch wenn das Foto selbst keine Koordinaten mitbringt. Einträge ohne Foto
+                  bleiben unberührt.
                 </small>
               </span>
               <input type="checkbox" className="switch" checked={me.auto_location} onChange={(e) => update({ auto_location: e.target.checked })} />

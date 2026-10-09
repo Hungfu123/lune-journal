@@ -102,10 +102,12 @@ export function useComposer(onPosted: (e: Entry) => void, autoLocation = false) 
     )
   }
 
-  // Schalter „Standort automatisch mitgeben": einmal leise fragen. Scheitert das
+  // Schalter „Standort automatisch mitgeben": einmal leise fragen, sobald Fotos
+  // dranhängen. Ein reiner Text-Eintrag soll ein reiner Text-Eintrag bleiben —
+  // wer dort einen Ort will, tippt ihn selbst ein. Scheitert die Abfrage
   // (keine Erlaubnis, kein Empfang), passiert nichts weiter — kein Fehlertext.
   useEffect(() => {
-    if (!autoLocation || coords || !navigator.geolocation) return
+    if (!autoLocation || coords || !uploads.length || !navigator.geolocation) return
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude })
@@ -118,7 +120,7 @@ export function useComposer(onPosted: (e: Entry) => void, autoLocation = false) 
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoLocation])
+  }, [autoLocation, uploads.length])
 
   const connectGoogle = async () => {
     try {
@@ -177,8 +179,9 @@ export function useComposer(onPosted: (e: Entry) => void, autoLocation = false) 
         mood,
         energy,
         place,
-        lat: coords?.lat ?? null,
-        lon: coords?.lon ?? null,
+        // Fotos wieder entfernt? Dann auch keine automatischen Koordinaten
+        lat: ready.length ? coords?.lat ?? null : null,
+        lon: ready.length ? coords?.lon ?? null : null,
         entry_date: entryDate,
         photo_ids: ready.map((u) => u.photo!.id),
       })
