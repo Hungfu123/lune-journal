@@ -69,9 +69,15 @@ export default function EntryCard({ entry, fresh, highlight, onHeart, onDelete, 
           <strong>{entry.author.name}</strong>
           <span>
             {dayLabel(entry.date)}
-            {entry.mood && `, fühlt sich ${entry.mood}`}
+            {entry.place_name && `, ${entry.place_name}`}
           </span>
         </div>
+        {entry.mood && (
+          <span className="mood-tag" data-mood={entry.mood}>
+            <i aria-hidden="true" />
+            {entry.mood}
+          </span>
+        )}
         {entry.mine && (
           <button type="button" className="icon-btn" aria-label="Optionen" onClick={() => setMenu(true)}>
             <More />

@@ -127,7 +127,9 @@ input, textarea, select { font: inherit; color: inherit; }
 .segmented-active span { display: grid; place-items: center; }
 
 /* ---------- Karten ---------- */
-.feed { display: grid; gap: 14px; padding: 6px 16px 0; }
+/* Unten Platz lassen: der Plus-Knopf schwebt über dem Inhalt und verdeckte
+   sonst die letzte Karte. 64 px Knopf + Abstand + Android-Leiste. */
+.feed { display: grid; gap: 14px; padding: 6px 16px calc(104px + env(safe-area-inset-bottom)); }
 .card { --c: var(--me); --c-on: var(--me-on); background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--radius); padding: 16px;
   transition: border-color 300ms ease, box-shadow 300ms ease; }
 .card.is-her { --c: var(--her); --c-on: var(--her-on); }
@@ -162,6 +164,12 @@ input, textarea, select { font: inherit; color: inherit; }
 .pill[aria-pressed='true'] { color: var(--me); border-color: color-mix(in srgb, var(--me) 35%, var(--line)); }
 .heart path { transition: fill 160ms ease; }
 .icon-btn { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; color: var(--muted); font-size: 22px; }
+/* In der Kopfzeile eine sichtbare Fläche: ohne sie liest man die Symbole als
+   Verzierung und findet Buch und Einstellungen gar nicht erst. */
+.top .icon-btn, .top .avatars { background: var(--surface); border: 1.5px solid var(--line); }
+.top .icon-btn { color: var(--ink); }
+.top .avatars { border-radius: 999px; padding: 3px 8px 3px 4px; height: 44px; align-items: center; gap: 0; }
+.top .avatars .avatar { width: 30px; height: 30px; border-width: 2px; border-color: var(--surface); font-size: 12px; }
 .link-btn { min-height: 44px; padding: 0 4px; font-size: 15px; font-weight: 700; color: var(--c, var(--muted)); }
 .btn-primary { min-height: 52px; padding: 0 22px; border-radius: 999px; background: var(--me); color: var(--me-on); font-size: 16px; font-weight: 700; }
 .btn-secondary { min-height: 52px; padding: 0 22px; border-radius: 999px; background: var(--surface); border: 1.5px solid var(--line); font-size: 15px; font-weight: 700; }
@@ -254,6 +262,21 @@ input, textarea, select { font: inherit; color: inherit; }
 .login-mark { display: flex; }
 .login-mark span { width: 56px; height: 56px; border-radius: 50%; background: var(--me); }
 .login-mark span + span { margin-left: -18px; background: var(--her); opacity: 0.92; }
+
+
+/* Stimmung als eigenes Zeichen statt angehängtem Text — vorher ging sie
+   zwischen Datum und Ort unter. */
+.mood-tag { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; margin-left: auto;
+  padding: 5px 11px 5px 9px; border-radius: 999px; font-size: 13px; font-weight: 700; text-transform: lowercase;
+  background: color-mix(in srgb, var(--stimmung) 14%, var(--surface));
+  border: 1.5px solid color-mix(in srgb, var(--stimmung) 32%, var(--line));
+  color: color-mix(in srgb, var(--stimmung) 70%, var(--ink)); }
+.mood-tag i { width: 9px; height: 9px; border-radius: 50%; background: var(--stimmung); }
+.mood-tag { --stimmung: var(--muted); }
+.mood-tag[data-mood='müde'] { --stimmung: #7c8aa5; }
+.mood-tag[data-mood='okay'] { --stimmung: #c08a3e; }
+.mood-tag[data-mood='gut'] { --stimmung: #4f9a68; }
+.mood-tag[data-mood='super'] { --stimmung: var(--me); }
 
 /* ---------- Toasts (Sonner) ---------- */
 /* Sonner bringt eigene helle Farben mit — die passen in den dunklen Themes
