@@ -465,6 +465,9 @@ input, textarea, select { font: inherit; color: inherit; }
 /* ---------- Eingabe: zwei Dinge nebeneinander ---------- */
 .composer-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: start; }
 .composer-row > .field { min-width: 0; }
+/* Beide Chips füllen ihre Spalte: nebeneinander sollen sie gleich aussehen,
+   sonst wirkt die Zeile wie aus zwei verschiedenen Formularen. */
+.composer-row .chip-btn { width: 100%; justify-self: stretch; }
 
 /* ---------- Tag des Eintrags ---------- */
 .date-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }

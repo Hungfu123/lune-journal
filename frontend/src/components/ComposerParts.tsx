@@ -141,7 +141,7 @@ export function DateSuggestion({ c }: { c: Composer }) {
   const gewaehlt = c.entryDate ?? heute
   return (
     <div className="field">
-      <span>Tag</span>
+      <span>Datum</span>
       <div className="date-row">
         <label className="chip-btn date-chip">
           {c.entryDate ? shortDate(c.entryDate) : 'Heute'}
