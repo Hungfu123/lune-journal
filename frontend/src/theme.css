@@ -181,7 +181,10 @@ input, textarea, select { font: inherit; color: inherit; }
   clip-path: inset(0 100% 0 0); transition: clip-path 200ms var(--ease-out); }
 .hold[data-holding] .hold-fill { clip-path: inset(0 0 0 0); transition: clip-path 2s linear; }
 
+/* align-self/align-content: start — sonst dehnt der Schreibtisch (1fr-Spalte)
+   die Box auf die volle Resthöhe und der Knopf wird zum Oval. */
 .empty { margin: 24px 8px 0; padding: 28px 20px; display: grid; justify-items: center; gap: 14px; text-align: center;
+  align-self: start; align-content: start;
   border: 1.5px dashed var(--line); border-radius: var(--radius); }
 .empty p { margin: 0; font-family: var(--font-hand); font-size: 28px; color: var(--muted); }
 
