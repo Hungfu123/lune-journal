@@ -70,6 +70,11 @@ beides freiwillig und beides direkt auf der Karte ablesbar.
 ein — ihr müsst euch nicht einigen.
 
 <p align="center">
+  <img src="docs/screenshots/handy-kommentare.png" width="260" alt="Kommentare unter einem Eintrag">
+  <img src="docs/screenshots/handy-karte.png" width="260" alt="Karte mit euren Orten">
+</p>
+
+<p align="center">
   <img src="docs/screenshots/handy-buch.png" width="260" alt="Buch erstellen">
   <img src="docs/screenshots/handy-einstellungen.png" width="260" alt="Designs und Erinnerung">
 </p>
