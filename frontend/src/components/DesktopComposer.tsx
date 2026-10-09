@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import type { SharedContent } from '../share'
 import { useComposer } from '../useComposer'
 import type { Entry, Me } from '../types'
 import { DateSuggestion, MoodPicker, PhotoButtons, PhotoStrip } from './ComposerParts'
@@ -9,6 +10,8 @@ import Segmented from './Segmented'
 
 export interface ComposerHandle {
   focus: () => void
+  /** Über das Teilen-Menü hereingereichte Fotos in den Schreibtisch legen */
+  addShared: (shared: SharedContent) => void
 }
 
 const isMac = /Mac|iPhone|iPad/.test(navigator.platform)
@@ -28,6 +31,13 @@ const DesktopComposer = forwardRef<ComposerHandle, { me: Me; onPosted: (e: Entry
   useImperativeHandle(ref, () => ({
     focus: () => {
       setOpen(true)
+      area.current?.scrollIntoView({ block: 'center' })
+      area.current?.focus()
+    },
+    addShared: (shared: SharedContent) => {
+      setOpen(true)
+      if (shared.files.length) void c.addFiles(shared.files)
+      if (shared.text && !c.text.trim()) c.setText(shared.text)
       area.current?.scrollIntoView({ block: 'center' })
       area.current?.focus()
     },

@@ -42,6 +42,10 @@ euer Monat in Zahlen und eine Fotowand.
 Druckqualität, optional 3 mm Beschnitt für die Druckerei. Mit Cover, Inhaltsverzeichnis, Monatsseiten,
 Fragen und Jahresrückblick. Vorher durchblättern, dann teilen oder drucken.
 
+**Fotos aus jeder App hereinreichen.** Lune Journal steht im Teilen-Menü eurer Pixel: in Google Fotos
+(auch in einem gemeinsamen Album), WhatsApp oder der Galerie die Bilder markieren, *Teilen* → *Lune Journal*.
+Der Eintrag geht auf, die Fotos hängen schon dran. Dafür muss die App auf dem Handy installiert sein.
+
 **Es euch schön machen.** Elf Designs, jedes mit eigener Überschrift-Schrift. Jeder stellt sein eigenes
 ein — ihr müsst euch nicht einigen.
 
@@ -101,6 +105,9 @@ Google Cloud Console → neues Projekt → *APIs & Dienste*:
 2. **Anmeldedaten → OAuth-Client-ID**, Typ *Webanwendung*.
    Autorisierte JavaScript-Quellen: `https://lune-journal.duckdns.org` und für lokal `http://localhost:5173`.
 3. Die Client-ID landet in der `.env` als `GOOGLE_CLIENT_ID`.
+
+Der Picker zeigt nur die **eigene** Mediathek — geteilte Alben sind dort nicht auswählbar. Dafür gibt es
+das Teilen-Menü (siehe oben), das durch alles hindurch funktioniert.
 
 **Google Fotos (optional):** Dieselbe Konsole, *Photos Picker API* aktivieren und im
 Zustimmungsbildschirm den Bereich `.../auth/photospicker.mediaitems.readonly` ergänzen. Beim ersten Klick
@@ -200,8 +207,7 @@ cd frontend && npm run build   # tsc -b + Produktions-Build
 
 ## Was noch kommen könnte
 
-1. Teilen direkt aus Google Fotos (Web Share Target)
-2. Lese-Modus für lange Einträge
-3. Ruhezeiten und gebündelte Benachrichtigungen
-4. Buch: eigenes Cover-Foto wählen, einzelne Einträge ausblenden
-5. Videos, Sprachnotizen, Garmin-Daten an Lauf-Einträgen, Karte
+1. Lese-Modus für lange Einträge
+2. Ruhezeiten und gebündelte Benachrichtigungen
+3. Buch: eigenes Cover-Foto wählen, einzelne Einträge ausblenden
+4. Videos, Sprachnotizen, Garmin-Daten an Lauf-Einträgen, Karte

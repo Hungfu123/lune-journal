@@ -15,6 +15,13 @@
 		reverse_proxy api:8000
 	}
 
+	# Teilen-Ziel: normalerweise fängt der Service Worker den POST im Browser ab
+	# und der Server sieht ihn nie. Fehlt er (frisch installiert, Cache geleert),
+	# soll trotzdem die App aufgehen statt ein nacktes "405 Method Not Allowed".
+	handle /share {
+		redir / 303
+	}
+
 	# Fotos: Caddy fragt vor jeder Datei die API, ob ihr angemeldet seid
 	handle /media/* {
 		forward_auth api:8000 {

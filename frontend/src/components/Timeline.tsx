@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { api } from '../api'
 import { dayLabel, monthKey, monthName } from '../dates'
 import { enablePush, shouldAskForPush } from '../push'
+import { takeSharedContent, type SharedContent } from '../share'
 import { useLive } from '../useLive'
 import { useIsDesktop, useMedia } from '../useMedia'
 import type { Entry, Me, Photo, Question } from '../types'
@@ -51,6 +52,7 @@ export default function Timeline({ me, onMeChange }: { me: Me; onMeChange: (m: M
   const [lightbox, setLightbox] = useState<{ photos: Photo[]; index: number; caption: string } | null>(null)
   const startWriting = () => (desktop ? composer.current?.focus() : setNewOpen(true))
   const [monthOpen, setMonthOpen] = useState(false)
+  const [shared, setShared] = useState<SharedContent | null>(null)
   const partner = me.partner?.name ?? 'Partner'
 
   /** `markNew`: Einträge, die seit dem letzten Laden dazugekommen sind, gleiten herein. */
@@ -118,6 +120,27 @@ export default function Timeline({ me, onMeChange }: { me: Me; onMeChange: (m: M
       toast('Antwort gespeichert')
     }
   }
+
+  // Über das Android-Teilen-Menü geöffnet: Fotos abholen und den Eintrag aufmachen
+  useEffect(() => {
+    if (!params.get('share')) return
+    history.replaceState(null, '', '/')
+    takeSharedContent().then((content) => {
+      if (!content.files.length && !content.text) {
+        toast.error('Die geteilten Fotos sind nicht angekommen. Teil sie noch einmal.')
+        return
+      }
+      if (desktop) {
+        // Der Schreibtisch hängt am aktuellen Monat
+        setMonth(nowKey)
+        composer.current?.addShared(content)
+      } else {
+        setShared(content)
+        setNewOpen(true)
+      }
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Aus einer Benachrichtigung geöffnet: zum Eintrag scrollen
   useEffect(() => {
@@ -307,7 +330,7 @@ export default function Timeline({ me, onMeChange }: { me: Me; onMeChange: (m: M
         <Plus />
       </button>
 
-      {!desktop && <NewEntrySheet open={newOpen} onOpenChange={setNewOpen} onPosted={posted} />}
+      {!desktop && <NewEntrySheet open={newOpen} onOpenChange={setNewOpen} onPosted={posted} shared={shared} />}
       {lightbox && (
         <Lightbox photos={lightbox.photos} start={lightbox.index} caption={lightbox.caption} onClose={() => setLightbox(null)} />
       )}

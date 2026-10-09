@@ -55,6 +55,11 @@ der Softball-App den Container unter `lune-web` erreicht.
 Zertifikat: `certbot certonly --standalone`, dafür muss der Nginx-Container kurz stehen —
 genau wie bei den beiden anderen Domains auf dem Server.
 
+- **Teilen-Ziel:** `share_target` im Manifest (`vite.config.ts`) → POST auf `/share` → der Service
+  Worker (`src/sw.ts`) legt die Dateien im Cache `geteilt` ab und leitet auf `/?share=n` um,
+  `src/share.ts` holt sie dort genau einmal ab. Der Service Worker ruft `skipWaiting()` und
+  `clientsClaim()`, sonst wäre er beim ersten Start nicht zuständig und der POST ginge an den Server.
+
 ## Noch nicht mit echten Konten getestet
 - Google-Login (braucht echte `GOOGLE_CLIENT_ID`)
 - Google Fotos Picker (Photos Picker API in der Cloud Console aktivieren)
@@ -69,4 +74,4 @@ abfotografieren. Echte Fotos oder echte Texte gehören nicht ins Repo.
 Keine `Co-Authored-By`-Zeilen (wie im Softball-Repo).
 
 ## Nächste Ideen
-Teilen aus Google Fotos (Web Share Target), Lese-Modus, Ruhezeiten für Push, eigenes Cover-Foto fürs Buch, Videos, Sprachnotizen, Garmin-Daten an Lauf-Einträgen, Karte.
+Lese-Modus, Ruhezeiten für Push, eigenes Cover-Foto fürs Buch, Videos, Sprachnotizen, Garmin-Daten an Lauf-Einträgen, Karte.

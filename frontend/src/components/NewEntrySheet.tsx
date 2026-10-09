@@ -1,4 +1,6 @@
+import { useEffect, useRef } from 'react'
 import { Drawer } from 'vaul'
+import type { SharedContent } from '../share'
 import { useComposer } from '../useComposer'
 import { useSheetDirection } from '../useMedia'
 import type { Entry } from '../types'
@@ -9,15 +11,28 @@ interface Props {
   open: boolean
   onOpenChange: (o: boolean) => void
   onPosted: (e: Entry) => void
+  /** Über das Teilen-Menü hereingereichte Fotos */
+  shared?: SharedContent | null
 }
 
 /** Handy: neuer Eintrag als Sheet von unten. */
-export default function NewEntrySheet({ open, onOpenChange, onPosted }: Props) {
+export default function NewEntrySheet({ open, onOpenChange, onPosted, shared }: Props) {
   const direction = useSheetDirection()
   const c = useComposer((e) => {
     onOpenChange(false)
     onPosted(e)
   })
+
+  // Geteilte Fotos genau einmal übernehmen, nicht bei jedem Rendern
+  const übernommen = useRef<SharedContent | null>(null)
+  useEffect(() => {
+    if (!open || !shared || übernommen.current === shared) return
+    übernommen.current = shared
+    if (shared.files.length) void c.addFiles(shared.files)
+    // Mitgeschickten Text nur nehmen, wenn kein Entwurf im Weg ist
+    if (shared.text && !c.text.trim()) c.setText(shared.text)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, shared])
 
   return (
     <Drawer.Root direction={direction} open={open} onOpenChange={onOpenChange} repositionInputs={false}>

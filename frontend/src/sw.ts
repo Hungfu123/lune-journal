@@ -1,4 +1,5 @@
 /// <reference lib="webworker" />
+import { clientsClaim } from 'workbox-core'
 import { ExpirationPlugin } from 'workbox-expiration'
 import { precacheAndRoute } from 'workbox-precaching'
 import { registerRoute } from 'workbox-routing'
@@ -7,6 +8,12 @@ import { CacheFirst } from 'workbox-strategies'
 declare let self: ServiceWorkerGlobalScope
 
 precacheAndRoute(self.__WB_MANIFEST)
+
+// Ohne das übernimmt eine neue Fassung erst beim übernächsten Start. Fürs
+// Teilen-Menü muss der Service Worker aber zuständig sein, sonst landet der
+// POST auf /share beim Server statt hier.
+self.skipWaiting()
+clientsClaim()
 
 // Fotos ändern sich nie (neuer Name pro Upload): einmal laden, danach sofort aus dem Handy-Speicher.
 // Funktioniert auch offline, z. B. beim Durchblättern in der Bahn.
@@ -17,6 +24,50 @@ registerRoute(
     plugins: [new ExpirationPlugin({ maxEntries: 600, maxAgeSeconds: 120 * 24 * 3600, purgeOnQuotaError: true })],
   }),
 )
+
+// ---------- Teilen-Ziel ----------
+// Android schickt geteilte Fotos als POST an /share. Die Antwort muss eine
+// Weiterleitung sein, damit die App danach normal aufgeht; die Dateien selbst
+// parken wir solange im Cache, weil sie nicht in eine URL passen.
+const SHARE_CACHE = 'geteilt'
+
+self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url)
+  if (event.request.method !== 'POST' || url.pathname !== '/share') return
+
+  event.respondWith(
+    (async () => {
+      let count = 0
+      try {
+        const form = await event.request.formData()
+        const files = form.getAll('photos').filter((f): f is File => f instanceof File && f.type.startsWith('image/'))
+        const cache = await caches.open(SHARE_CACHE)
+        await Promise.all(
+          files.map((f, i) =>
+            cache.put(
+              `/__geteilt/${i}`,
+              new Response(f, {
+                headers: {
+                  'Content-Type': f.type || 'image/jpeg',
+                  // Dateiname überlebt den Cache nicht von allein
+                  'X-Dateiname': encodeURIComponent(f.name || `foto-${i}.jpg`),
+                },
+              }),
+            ),
+          ),
+        )
+        const text = [form.get('title'), form.get('text')]
+          .filter((v): v is string => typeof v === 'string' && v.trim() !== '')
+          .join(' ')
+        if (text) await cache.put('/__geteilt/text', new Response(text))
+        count = files.length
+      } catch {
+        /* Nichts verwertbares dabei — die App geht trotzdem auf */
+      }
+      return Response.redirect(new URL(`/?share=${count}`, self.location.origin).href, 303)
+    })(),
+  )
+})
 
 interface PushData {
   title: string

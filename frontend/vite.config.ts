@@ -24,6 +24,18 @@ export default defineConfig({
           { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },
           { src: '/icon-512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
+        // Lune Journal steht im Teilen-Menü von Android. Den POST auf /share
+        // fängt der Service Worker ab (src/sw.ts) — nur mit installierter App.
+        share_target: {
+          action: '/share',
+          method: 'POST',
+          enctype: 'multipart/form-data',
+          params: {
+            title: 'title',
+            text: 'text',
+            files: [{ name: 'photos', accept: ['image/*'] }],
+          },
+        },
       },
       injectManifest: { globPatterns: ['**/*.{js,css,html,png,svg,woff2}'] },
     }),
