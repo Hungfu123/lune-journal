@@ -211,7 +211,17 @@ input, textarea, select { font: inherit; color: inherit; }
 .upload-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
 .upload { position: relative; width: 84px; height: 84px; flex-shrink: 0; border-radius: 14px; overflow: hidden; background: var(--soft); }
 .upload img { width: 100%; height: 100%; object-fit: cover; transition: opacity 200ms ease; }
-.upload[data-status='uploading'] img { opacity: 0.5; }
+.upload[data-status='uploading'] img { opacity: 0.45; }
+
+/* Fortschritt beim Hochladen: große Fotos aus Google Fotos dauern, ohne Balken
+   sieht es aus, als wäre nichts passiert. */
+.upload-progress { position: absolute; left: 8px; right: 8px; bottom: 8px; height: 5px; border-radius: 999px;
+  background: rgb(0 0 0 / 0.3); overflow: hidden; }
+.upload-progress span { display: block; height: 100%; border-radius: inherit; background: var(--me);
+  transform-origin: left; transition: transform 160ms linear; }
+/* Hochgeladen, aber der Server rechnet noch an den Bildgrößen */
+.upload-progress[data-fertig='true'] span { animation: upload-rechnet 1.1s var(--ease-in-out) infinite; }
+@keyframes upload-rechnet { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 .upload[data-status='error'] { outline: 2px solid var(--me); }
 .upload-remove { position: absolute; top: 4px; right: 4px; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%;
   background: rgba(0, 0, 0, 0.55); color: #fff; }
@@ -246,13 +256,30 @@ input, textarea, select { font: inherit; color: inherit; }
 .login-mark span + span { margin-left: -18px; background: var(--her); opacity: 0.92; }
 
 /* ---------- Toasts (Sonner) ---------- */
-.toast { font-family: var(--font-body) !important; border-radius: 18px !important; }
+/* Sonner bringt eigene helle Farben mit — die passen in den dunklen Themes
+   nicht. Deshalb alles aus den Theme-Variablen. */
+.toast {
+  font-family: var(--font-body) !important;
+  border-radius: 18px !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border: 1.5px solid var(--line) !important;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.16) !important;
+}
+.toast [data-description] { color: var(--muted) !important; }
+.toast [data-icon] { color: var(--me) !important; }
+.toast [data-button] {
+  background: var(--me) !important; color: var(--me-on) !important;
+  border-radius: 999px !important; font-weight: 700 !important; height: 32px !important; padding: 0 14px !important;
+}
+.toast[data-type='error'] { border-color: color-mix(in srgb, var(--me) 50%, var(--line)) !important; }
 
 /* ---------- Weniger Bewegung ---------- */
 @media (prefers-reduced-motion: reduce) {
   button:active:not(:disabled) { transform: none; }
   .rise { transition: opacity 200ms ease; }
   @starting-style { .rise { transform: none; } }
+  .upload-progress[data-fertig='true'] span { animation: none; opacity: 0.7; }
 }
 
 /* ---------- Fragen ---------- */

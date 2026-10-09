@@ -28,6 +28,20 @@ export function PhotoStrip({ c, reorder = false }: { c: Composer; reorder?: bool
           title={reorder ? 'Ziehen zum Sortieren' : undefined}
         >
           <img src={u.preview} alt="" />
+          {u.status === 'uploading' && (
+            <div
+              className="upload-progress"
+              data-fertig={u.progress >= 1 ? 'true' : undefined}
+              role="progressbar"
+              aria-label="Foto wird hochgeladen"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(u.progress * 100)}
+            >
+              {/* Breite über transform, damit nur der Compositor arbeitet */}
+              <span style={{ transform: `scaleX(${Math.max(0.04, u.progress)})` }} />
+            </div>
+          )}
           <button type="button" className="upload-remove" aria-label="Foto entfernen" onClick={() => c.remove(u.key)}>
             <Close />
           </button>

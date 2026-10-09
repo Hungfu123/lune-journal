@@ -23,7 +23,7 @@ export default function App() {
   return (
     <>
       {me === undefined ? null : me === null ? <Login onLogin={setMe} /> : <Timeline me={me} onMeChange={setMe} />}
-      <Toaster position="bottom-center" offset={96} toastOptions={{ className: 'toast' }} />
+      <Toaster position="top-center" offset={14} toastOptions={{ className: 'toast' }} />
     </>
   )
 }

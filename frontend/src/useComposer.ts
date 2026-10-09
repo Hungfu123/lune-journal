@@ -1,7 +1,7 @@
 import exifr from 'exifr'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { api } from './api'
+import { api, upload } from './api'
 import { isoDate, todayISO } from './dates'
 import { connectGooglePhotos, hasGooglePhotosToken, pickFromGooglePhotos } from './gphotos'
 import type { Entry, Photo } from './types'
@@ -11,6 +11,8 @@ export interface Upload {
   preview: string
   takenISO: string | null
   status: 'uploading' | 'done' | 'error'
+  /** 0 bis 1, danach rechnet der Server noch an den Bildgrößen */
+  progress: number
   photo?: Photo
 }
 
@@ -56,12 +58,11 @@ export function useComposer(onPosted: (e: Entry) => void) {
       } catch {
         /* keine Metadaten, auch gut */
       }
-      setUploads((u) => [...u, { key, preview: URL.createObjectURL(file), takenISO, status: 'uploading' }])
-      const form = new FormData()
-      form.append('file', file)
-      api
-        .post<Photo>('/api/photos', form)
-        .then((photo) => setUploads((u) => u.map((x) => (x.key === key ? { ...x, status: 'done', photo } : x))))
+      setUploads((u) => [...u, { key, preview: URL.createObjectURL(file), takenISO, status: 'uploading', progress: 0 }])
+      upload<Photo>('/api/photos', file, (anteil) =>
+        setUploads((u) => u.map((x) => (x.key === key ? { ...x, progress: anteil } : x))),
+      )
+        .then((photo) => setUploads((u) => u.map((x) => (x.key === key ? { ...x, status: 'done', progress: 1, photo } : x))))
         .catch((e) => {
           setUploads((u) => u.map((x) => (x.key === key ? { ...x, status: 'error' } : x)))
           toast.error((e as Error).message)
@@ -85,7 +86,7 @@ export function useComposer(onPosted: (e: Entry) => void) {
       const photos = await pickFromGooglePhotos(setGStatus)
       setUploads((u) => [
         ...u,
-        ...photos.map((photo) => ({ key: photo.id, preview: photo.thumb, takenISO: photo.taken_at?.slice(0, 10) ?? null, status: 'done' as const, photo })),
+        ...photos.map((photo) => ({ key: photo.id, preview: photo.thumb, takenISO: photo.taken_at?.slice(0, 10) ?? null, status: 'done' as const, progress: 1, photo })),
       ])
       if (photos.length) toast(`${photos.length} ${photos.length === 1 ? 'Foto' : 'Fotos'} aus Google Fotos übernommen`)
     } catch (e) {
