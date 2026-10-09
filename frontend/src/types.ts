@@ -28,6 +28,7 @@ export interface Entry {
   title: string
   text: string
   mood: string
+  energy: number | null
   created_at: string
   author: { id: number; name: string }
   mine: boolean

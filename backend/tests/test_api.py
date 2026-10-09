@@ -292,3 +292,13 @@ def test_publish_reaches_open_connections():
         asyncio.run(szenario())
     finally:
         live.set_loop(before)  # sonst zeigt der Kanal auf einen geschlossenen Loop
+
+
+# ---------- Energielevel ----------
+
+def test_energy_is_optional_and_bounded(as_user, no_network):
+    c = as_user("hung")
+    assert c.post("/api/entries", json={"kind": "short", "text": "Langer Lauf", "energy": 7}).json()["energy"] == 7
+    assert c.post("/api/entries", json={"kind": "short", "text": "ohne Angabe"}).json()["energy"] is None
+    for daneben in (0, 11, -3):
+        assert c.post("/api/entries", json={"kind": "short", "text": "x", "energy": daneben}).status_code == 422

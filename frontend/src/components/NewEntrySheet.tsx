@@ -4,7 +4,7 @@ import type { SharedContent } from '../share'
 import { useComposer } from '../useComposer'
 import { useSheetDirection } from '../useMedia'
 import type { Entry } from '../types'
-import { DateSuggestion, MoodPicker, PhotoButtons, PhotoStrip } from './ComposerParts'
+import { DateSuggestion, EnergyPicker, MoodPicker, PhotoButtons, PhotoStrip } from './ComposerParts'
 import Segmented from './Segmented'
 
 interface Props {
@@ -79,6 +79,7 @@ export default function NewEntrySheet({ open, onOpenChange, onPosted, shared }: 
             <div className="field">
               <span>Wie war dein Tag?</span>
               <MoodPicker c={c} />
+            <EnergyPicker c={c} />
             </div>
           </div>
         </Drawer.Content>

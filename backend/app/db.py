@@ -27,20 +27,28 @@ def init_db() -> None:
 
 
 # Neue Spalten für bestehende Datenbanken nachrüsten (SQLite kann create_all nicht erweitern)
-_USER_COLUMNS = {
-    "reminder_enabled": "BOOLEAN NOT NULL DEFAULT 1",
-    "reminder_weekday": "INTEGER NOT NULL DEFAULT 6",
-    "reminder_hour": "INTEGER NOT NULL DEFAULT 19",
-    "last_reminder_at": "DATETIME",
+_NEW_COLUMNS = {
+    "user": {
+        "reminder_enabled": "BOOLEAN NOT NULL DEFAULT 1",
+        "reminder_weekday": "INTEGER NOT NULL DEFAULT 6",
+        "reminder_hour": "INTEGER NOT NULL DEFAULT 19",
+        "last_reminder_at": "DATETIME",
+    },
+    "entry": {
+        "energy": "INTEGER",
+    },
 }
 
 
 def _add_missing_columns() -> None:
     with engine.begin() as conn:
-        existing = {row[1] for row in conn.exec_driver_sql("PRAGMA table_info('user')")}
-        for name, ddl in _USER_COLUMNS.items():
-            if name not in existing:
-                conn.exec_driver_sql(f"ALTER TABLE user ADD COLUMN {name} {ddl}")
+        for table, columns in _NEW_COLUMNS.items():
+            existing = {row[1] for row in conn.exec_driver_sql(f"PRAGMA table_info('{table}')")}
+            if not existing:
+                continue  # Tabelle gibt es noch nicht, create_all hat sie frisch angelegt
+            for name, ddl in columns.items():
+                if name not in existing:
+                    conn.exec_driver_sql(f"ALTER TABLE {table} ADD COLUMN {name} {ddl}")
 
 
 def get_db():

@@ -46,6 +46,7 @@ def entries_out(db: Session, entries: list[Entry], me: User) -> list[dict]:
             "title": e.title,
             "text": e.text,
             "mood": e.mood,
+            "energy": e.energy,
             "created_at": e.created_at.isoformat(),
             "author": {"id": e.user_id, "name": users[e.user_id].name},
             "mine": e.user_id == me.id,
@@ -100,6 +101,7 @@ class EntryIn(BaseModel):
     title: str = Field("", max_length=120)
     text: str = Field("", max_length=20000)
     mood: str = ""
+    energy: int | None = Field(None, ge=1, le=10)
     entry_date: date | None = None
     photo_ids: list[str] = Field(default_factory=list, max_length=30)
 
@@ -139,7 +141,7 @@ def create_entry(body: EntryIn, bg: BackgroundTasks, user: User = Depends(curren
         raise HTTPException(422, "Einträge in der Zukunft gehen nicht.")
 
     entry = Entry(user_id=user.id, entry_date=entry_date, kind=body.kind,
-                  title=body.title.strip(), text=body.text.strip(), mood=body.mood)
+                  title=body.title.strip(), text=body.text.strip(), mood=body.mood, energy=body.energy)
     db.add(entry)
     db.commit()
     db.refresh(entry)

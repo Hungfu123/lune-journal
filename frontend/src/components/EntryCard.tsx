@@ -78,6 +78,16 @@ export default function EntryCard({ entry, fresh, highlight, onHeart, onDelete, 
             {entry.mood}
           </span>
         )}
+        {entry.energy !== null && (
+          <span className="energy-tag" title={`Energie ${entry.energy} von 10`} aria-label={`Energie ${entry.energy} von 10`}>
+            <span className="energy-bar" aria-hidden="true">
+              {Array.from({ length: 10 }, (_, i) => (
+                <i key={i} data-an={i < entry.energy! ? 'true' : undefined} />
+              ))}
+            </span>
+            {entry.energy}
+          </span>
+        )}
         {entry.mine && (
           <button type="button" className="icon-btn" aria-label="Optionen" onClick={() => setMenu(true)}>
             <More />

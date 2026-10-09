@@ -22,6 +22,7 @@ export function useComposer(onPosted: (e: Entry) => void) {
   const [title, setTitle] = useState('')
   const [text, setText] = useState('')
   const [mood, setMood] = useState('')
+  const [energy, setEnergy] = useState<number | null>(null)
   const [uploads, setUploads] = useState<Upload[]>([])
   const [entryDate, setEntryDate] = useState<string | null>(null)
   const [dismissedDate, setDismissedDate] = useState<string | null>(null)
@@ -34,16 +35,16 @@ export function useComposer(onPosted: (e: Entry) => void) {
     const saved = localStorage.getItem('draft')
     if (saved) {
       const d = JSON.parse(saved)
-      setKind(d.kind ?? 'short'); setTitle(d.title ?? ''); setText(d.text ?? ''); setMood(d.mood ?? '')
+      setKind(d.kind ?? 'short'); setTitle(d.title ?? ''); setText(d.text ?? ''); setMood(d.mood ?? ''); setEnergy(d.energy ?? null)
     }
   }, [])
   useEffect(() => {
-    localStorage.setItem('draft', JSON.stringify({ kind, title, text, mood }))
-  }, [kind, title, text, mood])
+    localStorage.setItem('draft', JSON.stringify({ kind, title, text, mood, energy }))
+  }, [kind, title, text, mood, energy])
 
   const reset = () => {
     uploads.forEach((u) => u.preview.startsWith('blob:') && URL.revokeObjectURL(u.preview))
-    setKind('short'); setTitle(''); setText(''); setMood(''); setUploads([]); setEntryDate(null); setDismissedDate(null)
+    setKind('short'); setTitle(''); setText(''); setMood(''); setEnergy(null); setUploads([]); setEntryDate(null); setDismissedDate(null)
   }
 
   const addFiles = async (files: FileList | File[] | null) => {
@@ -125,6 +126,7 @@ export function useComposer(onPosted: (e: Entry) => void) {
         title: kind === 'long' ? title : '',
         text,
         mood,
+        energy,
         entry_date: entryDate,
         photo_ids: ready.map((u) => u.photo!.id),
       })
@@ -141,7 +143,7 @@ export function useComposer(onPosted: (e: Entry) => void) {
   }
 
   return {
-    kind, setKind, title, setTitle, text, setText, mood, setMood, uploads, addFiles, remove, move,
+    kind, setKind, title, setTitle, text, setText, mood, setMood, energy, setEnergy, uploads, addFiles, remove, move,
     entryDate, setEntryDate, suggested, showSuggestion, dismissSuggestion: () => setDismissedDate(suggested),
     posting, canPost, isEmpty, post, gStatus, gConnected, connectGoogle, pickGoogle,
   }

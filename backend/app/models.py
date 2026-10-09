@@ -38,6 +38,7 @@ class Entry(SQLModel, table=True):
     title: str = ""
     text: str = ""
     mood: str = ""
+    energy: Optional[int] = None  # 1–10, freiwillig
     created_at: datetime = Field(default_factory=utcnow)
 
 

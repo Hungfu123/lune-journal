@@ -51,6 +51,31 @@ export function PhotoStrip({ c, reorder = false }: { c: Composer; reorder?: bool
   )
 }
 
+/** Energie 1–10: zehn Felder, die sich füllen. Antippen setzt den Wert,
+ *  nochmal auf denselben Wert nimmt ihn zurück. */
+export function EnergyPicker({ c }: { c: Composer }) {
+  return (
+    <div className="field">
+      <span id="energie-label">
+        Energie {c.energy ? <b className="energy-value">{c.energy}/10</b> : <i className="energy-hint">freiwillig</i>}
+      </span>
+      <div className="energy" role="group" aria-labelledby="energie-label">
+        {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+          <button
+            key={n}
+            type="button"
+            className="energy-cell"
+            data-an={c.energy !== null && n <= c.energy ? 'true' : undefined}
+            aria-pressed={c.energy === n}
+            aria-label={`Energie ${n} von 10`}
+            onClick={() => c.setEnergy(c.energy === n ? null : n)}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export function PhotoButtons({ c, camera = true }: { c: Composer; camera?: boolean }) {
   const cam = useRef<HTMLInputElement>(null)
   const gal = useRef<HTMLInputElement>(null)

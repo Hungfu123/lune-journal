@@ -294,6 +294,23 @@ input, textarea, select { font: inherit; color: inherit; }
 .mood-tag[data-mood='gut'] { --stimmung: var(--stimmung-gut); }
 .mood-tag[data-mood='super'] { --stimmung: var(--me); }
 
+/* ---------- Energie ---------- */
+/* Zehn Felder, die sich füllen — angelehnt an eine Energieleiste im Spiel,
+   aber ohne Blinken: gefüllt heißt Farbe, leer heißt Umriss. */
+.energy { display: flex; gap: 4px; }
+.energy-cell { flex: 1; height: 34px; min-width: 0; border-radius: 7px; border: 1.5px solid var(--line);
+  background: var(--surface); transition: background-color 140ms var(--ease-out), border-color 140ms var(--ease-out); }
+.energy-cell[data-an] { background: var(--me); border-color: var(--me); }
+.energy-value { color: var(--me); }
+.energy-hint { font-weight: 400; font-style: normal; color: color-mix(in srgb, var(--muted) 75%, transparent); }
+
+/* Auf der Karte: dieselbe Leiste, nur klein */
+.energy-tag { display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0;
+  font-size: 13px; font-weight: 700; color: var(--muted); }
+.energy-bar { display: flex; gap: 2px; }
+.energy-bar i { width: 4px; height: 14px; border-radius: 2px; background: color-mix(in srgb, var(--line) 80%, var(--surface)); }
+.energy-bar i[data-an] { background: var(--c); }
+
 /* ---------- Toasts (Sonner) ---------- */
 /* Sonner bringt eigene helle Farben mit — die passen in den dunklen Themes
    nicht. Deshalb alles aus den Theme-Variablen. */
