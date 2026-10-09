@@ -30,7 +30,10 @@ export default function Timeline({ me, onMeChange }: { me: Me; onMeChange: (m: M
   const [month, setMonth] = useState(params.get('month') ?? nowKey)
   const [filter, setFilter] = useState<Filter>('all')
   const [entries, setEntries] = useState<Entry[] | null>(null)
-  const [freshId, setFreshId] = useState<number | null>(null)
+  // Welche Einträge gerade hereingleiten sollen: eigene frisch gepostete und
+  // die, die währenddessen von der anderen Person dazugekommen sind
+  const [freshIds, setFreshIds] = useState<ReadonlySet<number>>(() => new Set())
+  const knownIds = useRef<ReadonlySet<number>>(new Set())
   const [highlightId, setHighlightId] = useState<number | null>(Number(params.get('entry')) || null)
   const [newOpen, setNewOpen] = useState(params.get('new') === '1')
   const [openQs, setOpenQs] = useState<Question[]>([])
@@ -50,10 +53,20 @@ export default function Timeline({ me, onMeChange }: { me: Me; onMeChange: (m: M
   const [monthOpen, setMonthOpen] = useState(false)
   const partner = me.partner?.name ?? 'Partner'
 
-  const load = useCallback(() => {
+  /** `markNew`: Einträge, die seit dem letzten Laden dazugekommen sind, gleiten herein. */
+  const load = useCallback((markNew = false) => {
     api
       .get<Entry[]>(`/api/entries?month=${month}&author=${filter}`)
       .then((data) => {
+        const ids: ReadonlySet<number> = new Set(data.map((e) => e.id))
+        if (markNew) {
+          const arrived = data.filter((e) => !knownIds.current.has(e.id)).map((e) => e.id)
+          if (arrived.length) setFreshIds(new Set(arrived))
+        } else if (shownMonth.current !== month) {
+          // Zurück in einen Monat: alte Karten sollen nicht erneut hereingleiten
+          setFreshIds(new Set())
+        }
+        knownIds.current = ids
         // Nur beim Monatswechsel überblenden; Filter wechseln oft und bleiben deshalb sofort
         const prev = shownMonth.current
         shownMonth.current = month
@@ -82,7 +95,7 @@ export default function Timeline({ me, onMeChange }: { me: Me; onMeChange: (m: M
   // Änderungen stehen schon im State und würden nur unnötig neu laden.
   useLive((e) => {
     if (e.by === me.id) return
-    load()
+    load(true)
     if (e.kind === 'question') loadOpenQuestions()
   })
 
@@ -161,7 +174,7 @@ export default function Timeline({ me, onMeChange }: { me: Me; onMeChange: (m: M
       setFilter('all')
       setMonth(key)
     }
-    setFreshId(e.id)
+    setFreshIds(new Set([e.id]))
     toast('Gepostet')
     if (shouldAskForPush()) {
       toast(`Bescheid bekommen, wenn ${partner} etwas postet?`, {
@@ -260,7 +273,7 @@ export default function Timeline({ me, onMeChange }: { me: Me; onMeChange: (m: M
         )}
         {feed.map((item) =>
           item.kind === 'entry' ? (
-            <EntryCard key={`e${item.entry.id}`} entry={item.entry} fresh={item.entry.id === freshId} highlight={item.entry.id === highlightId} onHeart={heart} onDelete={remove} onOpenPhoto={(entry, index) => setLightbox({ photos: entry.photos, index, caption: `${entry.author.name}, ${dayLabel(entry.date)}` })} />
+            <EntryCard key={`e${item.entry.id}`} entry={item.entry} fresh={freshIds.has(item.entry.id)} highlight={item.entry.id === highlightId} onHeart={heart} onDelete={remove} onOpenPhoto={(entry, index) => setLightbox({ photos: entry.photos, index, caption: `${entry.author.name}, ${dayLabel(entry.date)}` })} />
           ) : (
             <QACard key={`q${item.q.id}`} q={item.q} me={me} fresh={item.q.id === freshQ} />
           ),
