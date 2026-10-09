@@ -23,6 +23,8 @@ export function useComposer(onPosted: (e: Entry) => void) {
   const [text, setText] = useState('')
   const [mood, setMood] = useState('')
   const [energy, setEnergy] = useState<number | null>(null)
+  const [place, setPlace] = useState('')
+  const [locating, setLocating] = useState(false)
   const [uploads, setUploads] = useState<Upload[]>([])
   const [entryDate, setEntryDate] = useState<string | null>(null)
   const [dismissedDate, setDismissedDate] = useState<string | null>(null)
@@ -35,16 +37,16 @@ export function useComposer(onPosted: (e: Entry) => void) {
     const saved = localStorage.getItem('draft')
     if (saved) {
       const d = JSON.parse(saved)
-      setKind(d.kind ?? 'short'); setTitle(d.title ?? ''); setText(d.text ?? ''); setMood(d.mood ?? ''); setEnergy(d.energy ?? null)
+      setKind(d.kind ?? 'short'); setTitle(d.title ?? ''); setText(d.text ?? ''); setMood(d.mood ?? ''); setEnergy(d.energy ?? null); setPlace(d.place ?? '')
     }
   }, [])
   useEffect(() => {
-    localStorage.setItem('draft', JSON.stringify({ kind, title, text, mood, energy }))
-  }, [kind, title, text, mood, energy])
+    localStorage.setItem('draft', JSON.stringify({ kind, title, text, mood, energy, place }))
+  }, [kind, title, text, mood, energy, place])
 
   const reset = () => {
     uploads.forEach((u) => u.preview.startsWith('blob:') && URL.revokeObjectURL(u.preview))
-    setKind('short'); setTitle(''); setText(''); setMood(''); setEnergy(null); setUploads([]); setEntryDate(null); setDismissedDate(null)
+    setKind('short'); setTitle(''); setText(''); setMood(''); setEnergy(null); setPlace(''); setUploads([]); setEntryDate(null); setDismissedDate(null)
   }
 
   const addFiles = async (files: FileList | File[] | null) => {
@@ -69,6 +71,33 @@ export function useComposer(onPosted: (e: Entry) => void) {
           toast.error((e as Error).message)
         })
     }
+  }
+
+  /** Standort des Handys holen und in einen Namen übersetzen. Die Koordinaten
+   *  gehen nur für diese eine Anfrage zum Server, gespeichert wird der Name. */
+  const useStandort = () => {
+    if (!navigator.geolocation) {
+      toast.error('Dieses Gerät gibt den Standort nicht her. Trag den Ort einfach selbst ein.')
+      return
+    }
+    setLocating(true)
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const r = await api.post<{ place_name: string }>('/api/place', { lat: pos.coords.latitude, lon: pos.coords.longitude })
+          setPlace(r.place_name)
+        } catch (e) {
+          toast.error((e as Error).message)
+        } finally {
+          setLocating(false)
+        }
+      },
+      () => {
+        setLocating(false)
+        toast.error('Der Standort war nicht abrufbar. Erlaub den Zugriff oder trag den Ort selbst ein.')
+      },
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 },
+    )
   }
 
   const connectGoogle = async () => {
@@ -127,6 +156,7 @@ export function useComposer(onPosted: (e: Entry) => void) {
         text,
         mood,
         energy,
+        place,
         entry_date: entryDate,
         photo_ids: ready.map((u) => u.photo!.id),
       })
@@ -143,7 +173,7 @@ export function useComposer(onPosted: (e: Entry) => void) {
   }
 
   return {
-    kind, setKind, title, setTitle, text, setText, mood, setMood, energy, setEnergy, uploads, addFiles, remove, move,
+    kind, setKind, title, setTitle, text, setText, mood, setMood, energy, setEnergy, place, setPlace, locating, useStandort, uploads, addFiles, remove, move,
     entryDate, setEntryDate, suggested, showSuggestion, dismissSuggestion: () => setDismissedDate(suggested),
     posting, canPost, isEmpty, post, gStatus, gConnected, connectGoogle, pickGoogle,
   }

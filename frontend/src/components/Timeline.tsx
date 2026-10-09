@@ -330,7 +330,7 @@ export default function Timeline({ me, onMeChange }: { me: Me; onMeChange: (m: M
         <Plus />
       </button>
 
-      {!desktop && <NewEntrySheet open={newOpen} onOpenChange={setNewOpen} onPosted={posted} shared={shared} />}
+      {!desktop && <NewEntrySheet open={newOpen} onOpenChange={setNewOpen} onPosted={posted} shared={shared} askPlace={me.ask_place} />}
       {lightbox && (
         <Lightbox photos={lightbox.photos} start={lightbox.index} caption={lightbox.caption} onClose={() => setLightbox(null)} />
       )}

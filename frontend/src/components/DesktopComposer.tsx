@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import type { SharedContent } from '../share'
 import { useComposer } from '../useComposer'
 import type { Entry, Me } from '../types'
-import { DateSuggestion, EnergyPicker, MoodPicker, PhotoButtons, PhotoStrip } from './ComposerParts'
+import { DateSuggestion, EnergyPicker, MoodPicker, PhotoButtons, PhotoStrip, PlacePicker } from './ComposerParts'
 import FocusWriter from './FocusWriter'
 import { Expand } from './Icons'
 import Segmented from './Segmented'
@@ -139,6 +139,7 @@ const DesktopComposer = forwardRef<ComposerHandle, { me: Me; onPosted: (e: Entry
             />
             <MoodPicker c={c} />
             <EnergyPicker c={c} />
+            <PlacePicker c={c} immer={me.ask_place} />
           </div>
           <PhotoButtons c={c} camera={false} />
           <div className="desk-foot">

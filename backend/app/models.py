@@ -17,6 +17,7 @@ class User(SQLModel, table=True):
     reminder_enabled: bool = True
     reminder_weekday: int = 6  # 0 = Montag … 6 = Sonntag
     reminder_hour: int = 19
+    ask_place: bool = False  # beim Schreiben immer nach dem Ort fragen
     last_reminder_at: Optional[datetime] = None
     created_at: datetime = Field(default_factory=utcnow)
 
@@ -39,6 +40,7 @@ class Entry(SQLModel, table=True):
     text: str = ""
     mood: str = ""
     energy: Optional[int] = None  # 1–10, freiwillig
+    place: str = ""  # selbst eingetragen; Fotos liefern ihren Ort weiterhin selbst
     created_at: datetime = Field(default_factory=utcnow)
 
 

@@ -294,6 +294,12 @@ input, textarea, select { font: inherit; color: inherit; }
 .mood-tag[data-mood='gut'] { --stimmung: var(--stimmung-gut); }
 .mood-tag[data-mood='super'] { --stimmung: var(--me); }
 
+/* ---------- Ort ---------- */
+.place-row { display: flex; gap: 8px; align-items: stretch; }
+.place-row input { flex: 1; min-width: 0; }
+.place-row .btn-secondary { flex-shrink: 0; white-space: nowrap; }
+.place-add { justify-self: start; color: var(--me); }
+
 /* ---------- Energie ---------- */
 /* Zehn Felder, die sich füllen — angelehnt an eine Energieleiste im Spiel,
    aber ohne Blinken: gefüllt heißt Farbe, leer heißt Umriss. */

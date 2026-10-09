@@ -3,14 +3,16 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 from sqlalchemy import func
 from sqlmodel import Session, col, delete, select
 
 from ..config import settings
 from ..db import get_db
+from .. import geocode
 from ..images import delete_files, media_path
+from ..limiter import limiter
 from ..live import publish
 from ..models import Entry, Photo, Reaction, User
 from ..push import notify_others
@@ -51,7 +53,8 @@ def entries_out(db: Session, entries: list[Entry], me: User) -> list[dict]:
             "author": {"id": e.user_id, "name": users[e.user_id].name},
             "mine": e.user_id == me.id,
             "photos": ph,
-            "place_name": next((p["place_name"] for p in ph if p["place_name"]), None),
+            # Selbst eingetragener Ort hat Vorrang vor dem, was im Foto steckt
+            "place_name": e.place or next((p["place_name"] for p in ph if p["place_name"]), None),
             "hearts": len(hearts[e.id]),
             "hearted": me.id in hearts[e.id],
         })
@@ -102,6 +105,7 @@ class EntryIn(BaseModel):
     text: str = Field("", max_length=20000)
     mood: str = ""
     energy: int | None = Field(None, ge=1, le=10)
+    place: str = Field("", max_length=120)
     entry_date: date | None = None
     photo_ids: list[str] = Field(default_factory=list, max_length=30)
 
@@ -141,7 +145,7 @@ def create_entry(body: EntryIn, bg: BackgroundTasks, user: User = Depends(curren
         raise HTTPException(422, "Einträge in der Zukunft gehen nicht.")
 
     entry = Entry(user_id=user.id, entry_date=entry_date, kind=body.kind,
-                  title=body.title.strip(), text=body.text.strip(), mood=body.mood, energy=body.energy)
+                  title=body.title.strip(), text=body.text.strip(), mood=body.mood, energy=body.energy, place=body.place.strip())
     db.add(entry)
     db.commit()
     db.refresh(entry)
@@ -192,6 +196,24 @@ def toggle_heart(entry_id: int, bg: BackgroundTasks, only_add: bool = False,
             })
     publish("heart", user.id)
     return entries_out(db, [e], user)[0]
+
+
+class PlaceLookup(BaseModel):
+    lat: float = Field(..., ge=-90, le=90)
+    lon: float = Field(..., ge=-180, le=180)
+
+
+@router.post("/place")
+@limiter.limit("20/minute")
+def place_lookup(request: Request, body: PlaceLookup, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    """Koordinaten vom Handy in einen lesbaren Ort übersetzen (OpenStreetMap).
+    Die Koordinaten werden nur für diese Anfrage benutzt und nicht gespeichert —
+    am Eintrag landet allein der Name."""
+    # Modulzugriff statt direktem Import: so greift das Patchen in den Tests
+    name = geocode.reverse(db, body.lat, body.lon)
+    if not name:
+        raise HTTPException(503, "Der Ort ließ sich gerade nicht bestimmen. Trag ihn einfach selbst ein.")
+    return {"place_name": name}
 
 
 @router.get("/memory")

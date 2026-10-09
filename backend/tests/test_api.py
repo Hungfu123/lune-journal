@@ -302,3 +302,20 @@ def test_energy_is_optional_and_bounded(as_user, no_network):
     assert c.post("/api/entries", json={"kind": "short", "text": "ohne Angabe"}).json()["energy"] is None
     for daneben in (0, 11, -3):
         assert c.post("/api/entries", json={"kind": "short", "text": "x", "energy": daneben}).status_code == 422
+
+
+# ---------- Ort ----------
+
+def test_place_on_entry_and_lookup(as_user, no_network):
+    c = as_user("hung")
+    # Selbst eingetragener Ort gewinnt gegen den Ort aus dem Foto
+    assert c.post("/api/entries", json={"kind": "short", "text": "Picknick", "place": "Rheinwiese"}).json()["place_name"] == "Rheinwiese"
+    assert c.post("/api/entries", json={"kind": "short", "text": "ohne Ort"}).json()["place_name"] is None
+    assert c.post("/api/place", json={"lat": 51.22, "lon": 6.77}).json()["place_name"] == "Rheinufer, Düsseldorf"
+    assert c.post("/api/place", json={"lat": 999, "lon": 0}).status_code == 422
+
+
+def test_ask_place_setting(as_user):
+    c = as_user("hung")
+    assert c.get("/api/auth/me").json()["ask_place"] is False
+    assert c.patch("/api/auth/me", json={"ask_place": True}).json()["ask_place"] is True

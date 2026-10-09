@@ -6,6 +6,7 @@ export interface Me {
   email: string
   theme: Theme
   reminder: { enabled: boolean; weekday: number; hour: number }
+  ask_place: boolean
   partner: { id: number; name: string } | null
 }
 

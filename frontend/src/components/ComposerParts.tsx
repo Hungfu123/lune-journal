@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { shortDate } from '../dates'
 import type { Composer } from '../useComposer'
 import { Camera, Close, Gallery, GPhotos } from './Icons'
@@ -48,6 +48,36 @@ export function PhotoStrip({ c, reorder = false }: { c: Composer; reorder?: bool
         </div>
       ))}
     </div>
+  )
+}
+
+/** Ort: freiwillig. Wer in den Einstellungen „immer nach dem Ort fragen" anhat,
+ *  sieht das Feld direkt, sonst steht nur ein kleiner Link da. */
+export function PlacePicker({ c, immer }: { c: Composer; immer: boolean }) {
+  const [offen, setOffen] = useState(immer)
+  if (!offen && !c.place) {
+    return (
+      <button type="button" className="link-btn place-add" onClick={() => setOffen(true)}>
+        Ort hinzufügen
+      </button>
+    )
+  }
+  return (
+    <label className="field">
+      <span>Ort</span>
+      <div className="place-row">
+        <input
+          type="text"
+          value={c.place}
+          maxLength={120}
+          placeholder="Wo wart ihr?"
+          onChange={(e) => c.setPlace(e.target.value)}
+        />
+        <button type="button" className="btn-secondary btn-small" disabled={c.locating} onClick={c.useStandort}>
+          {c.locating ? 'Suche …' : 'Standort'}
+        </button>
+      </div>
+    </label>
   )
 }
 

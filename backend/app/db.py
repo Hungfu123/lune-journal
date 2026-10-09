@@ -33,9 +33,11 @@ _NEW_COLUMNS = {
         "reminder_weekday": "INTEGER NOT NULL DEFAULT 6",
         "reminder_hour": "INTEGER NOT NULL DEFAULT 19",
         "last_reminder_at": "DATETIME",
+        "ask_place": "BOOLEAN NOT NULL DEFAULT 0",
     },
     "entry": {
         "energy": "INTEGER",
+        "place": "TEXT NOT NULL DEFAULT ''",
     },
 }
 

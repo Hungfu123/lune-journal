@@ -85,6 +85,14 @@ export default function SettingsSheet({ open, onOpenChange, me, onMeChange }: Pr
 
             <label className="switch-row">
               <span>
+                <strong>Immer nach dem Ort fragen</strong>
+                <small>Dann steht beim Schreiben ein Feld für den Ort bereit. Fotos bringen ihren Ort weiterhin selbst mit.</small>
+              </span>
+              <input type="checkbox" className="switch" checked={me.ask_place} onChange={(e) => update({ ask_place: e.target.checked })} />
+            </label>
+
+            <label className="switch-row">
+              <span>
                 <strong>Wöchentliche Erinnerung</strong>
                 <small>Ein kleiner Anstoß, etwas aufzuschreiben. Fällt aus, wenn du an dem Tag schon geschrieben hast.</small>
               </span>
