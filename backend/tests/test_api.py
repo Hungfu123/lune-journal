@@ -261,3 +261,34 @@ def test_old_database_gets_new_columns(tmp_path):
         assert {"reminder_enabled", "reminder_weekday", "reminder_hour", "last_reminder_at"} <= cols
     finally:
         dbmod.engine = real
+
+
+# ---------- Live-Kanal ----------
+
+def test_stream_requires_login(as_user):
+    assert as_user(None).get("/api/stream").status_code == 401
+
+
+def test_publish_reaches_open_connections():
+    """publish() läuft im Threadpool, der Stream im Event-Loop — die Zustellung
+    muss über den Loop zurückgereicht werden."""
+    import asyncio
+
+    from app import live
+
+    before = live._loop
+
+    async def szenario():
+        live.set_loop(asyncio.get_running_loop())
+        q = live.subscribe()
+        try:
+            live.publish("entry", 7)
+            await asyncio.sleep(0)  # call_soon_threadsafe einplanen lassen
+            assert json.loads(q.get_nowait()) == {"kind": "entry", "by": 7}
+        finally:
+            live.unsubscribe(q)
+
+    try:
+        asyncio.run(szenario())
+    finally:
+        live.set_loop(before)  # sonst zeigt der Kanal auf einen geschlossenen Loop

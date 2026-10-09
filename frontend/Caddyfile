@@ -1,11 +1,17 @@
 # Kein HTTPS hier: in Produktion terminiert der Nginx der Softball-App TLS
 # und reicht an diesen Container weiter (siehe deploy/nginx-lune.conf).
 :80 {
-	encode zstd gzip
 	header X-Robots-Tag "noindex, nofollow"
+
+	# Live-Kanal (Server-Sent Events) — bewusst ohne `encode`: die Kompression
+	# sammelt Daten, bis ihr Puffer voll ist, und hielte die Ereignisse zurück.
+	handle /api/stream {
+		reverse_proxy api:8000
+	}
 
 	# API
 	handle /api/* {
+		encode zstd gzip
 		reverse_proxy api:8000
 	}
 
@@ -21,6 +27,7 @@
 
 	# Service Worker nie cachen, damit Updates sofort ankommen
 	handle /sw.js {
+		encode gzip
 		header Cache-Control "no-cache"
 		root * /srv/app
 		file_server
@@ -28,6 +35,7 @@
 
 	# App
 	handle {
+		encode zstd gzip
 		root * /srv/app
 		try_files {path} /index.html
 		file_server

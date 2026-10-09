@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { api } from '../api'
 import { dayLabel, monthKey, monthName } from '../dates'
 import { enablePush, shouldAskForPush } from '../push'
+import { useLive } from '../useLive'
 import { useIsDesktop, useMedia } from '../useMedia'
 import type { Entry, Me, Photo, Question } from '../types'
 import AskSheet from './AskSheet'
@@ -70,10 +71,20 @@ export default function Timeline({ me, onMeChange }: { me: Me; onMeChange: (m: M
     api.get<Question[]>(`/api/questions?month=${month}`).then(setAnswered).catch(() => setAnswered([]))
   }, [month, filter])
 
-  useEffect(load, [load])
-  useEffect(() => {
+  const loadOpenQuestions = useCallback(() => {
     api.get<Question[]>('/api/questions/open').then(setOpenQs).catch(() => setOpenQs([]))
   }, [])
+
+  useEffect(load, [load])
+  useEffect(loadOpenQuestions, [loadOpenQuestions])
+
+  // Schreibt die andere Person etwas, holt die Seite es sich sofort — eigene
+  // Änderungen stehen schon im State und würden nur unnötig neu laden.
+  useLive((e) => {
+    if (e.by === me.id) return
+    load()
+    if (e.kind === 'question') loadOpenQuestions()
+  })
 
   // Aus einer Fragen-Benachrichtigung geöffnet
   useEffect(() => {

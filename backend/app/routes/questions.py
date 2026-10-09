@@ -7,6 +7,7 @@ from sqlmodel import Session, col, select
 from ..config import settings
 from ..db import get_db
 from ..ideas import suggest
+from ..live import publish
 from ..models import Answer, Question, User
 from ..push import notify_others
 from ..security import current_user
@@ -101,6 +102,7 @@ def ask(body: QuestionIn, bg: BackgroundTasks, user: User = Depends(current_user
         "url": f"/?q={q.id}",
         "tag": f"question-{q.id}",
     })
+    publish("question", user.id)
     return _load(db, [q], user)[0]
 
 
@@ -123,6 +125,7 @@ def answer(question_id: int, body: AnswerIn, bg: BackgroundTasks, user: User = D
     if result["complete"]:
         title = "Beide Antworten sind da" if q.both else f"{user.name} hat deine Frage beantwortet"
         bg.add_task(notify_others, user.id, {"title": title, "body": q.text, "url": f"/?q={q.id}", "tag": f"question-{q.id}"})
+    publish("question", user.id)
     return result
 
 
@@ -138,4 +141,5 @@ def delete_question(question_id: int, user: User = Depends(current_user), db: Se
         db.delete(a)
     db.delete(q)
     db.commit()
+    publish("question", user.id)
     return {"ok": True}

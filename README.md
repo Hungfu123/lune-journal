@@ -31,7 +31,8 @@ landen in der Timeline. Wer keine Idee hat, lässt sich eine vorschlagen.
 für sich ein. Die Erinnerung fällt aus, wenn an dem Tag schon etwas geschrieben wurde.
 
 **Mitbekommen, was der andere schreibt.** Push aufs Handy mit Foto in der Benachrichtigung und einem
-„Herz senden"-Knopf direkt darin.
+„Herz senden"-Knopf direkt darin. Und wer die App gerade offen hat, sieht den neuen Eintrag sofort —
+ohne die Seite neu zu laden.
 
 **Zurückblättern.** Timeline pro Monat, Filter nach *Alle / Meine / Partner*, Monatsübersicht mit
 Anzahl und einer Zufalls-Erinnerung. Auf dem großen Bildschirm zusätzlich „Heute vor einem Jahr",
@@ -76,6 +77,7 @@ einfügen, per Ziehen sortieren, <kbd>Strg</kbd>+<kbd>Enter</kbd> postet. <kbd>N
 |------|---------|
 | Frontend | React 18, Vite, TypeScript, Vaul (Sheets), Sonner (Toasts), vite-plugin-pwa |
 | Backend | FastAPI, SQLModel auf SQLite (WAL), Pillow, WeasyPrint (Buch-PDF), pywebpush |
+| Live-Updates | Server-Sent Events auf `/api/stream`, Browser lädt bei Änderung nach |
 | Auslieferung | Caddy: App, `/api` → FastAPI, `/media` mit `forward_auth` |
 | Server | Hetzner VPS, Docker Compose, hinter dem Nginx der Softball-App (TLS) |
 

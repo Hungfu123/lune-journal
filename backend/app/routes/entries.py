@@ -11,6 +11,7 @@ from sqlmodel import Session, col, delete, select
 from ..config import settings
 from ..db import get_db
 from ..images import delete_files, media_path
+from ..live import publish
 from ..models import Entry, Photo, Reaction, User
 from ..push import notify_others
 from ..security import current_user, signed_media_url
@@ -148,6 +149,7 @@ def create_entry(body: EntryIn, bg: BackgroundTasks, user: User = Depends(curren
     db.commit()
 
     bg.add_task(_notify_new_entry, entry, user, photos[0].id if photos else None)
+    publish("entry", user.id)
     return entries_out(db, [entry], user)[0]
 
 
@@ -162,6 +164,7 @@ def delete_entry(entry_id: int, user: User = Depends(current_user), db: Session 
     db.exec(delete(Reaction).where(Reaction.entry_id == e.id))
     db.delete(e)
     db.commit()
+    publish("entry", user.id)
     return {"ok": True}
 
 
@@ -185,6 +188,7 @@ def toggle_heart(entry_id: int, bg: BackgroundTasks, only_add: bool = False,
                 "url": f"/?entry={e.id}&month={e.entry_date:%Y-%m}",
                 "tag": f"heart-{e.id}",
             })
+    publish("heart", user.id)
     return entries_out(db, [e], user)[0]
 
 

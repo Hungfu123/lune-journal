@@ -7,13 +7,16 @@ from slowapi.errors import RateLimitExceeded
 
 from .db import init_db
 from .limiter import limiter
+from .live import set_loop
 from .reminders import reminder_loop
-from .routes import auth, book, entries, gphotos, photos, push, questions
+from .routes import auth, book, entries, gphotos, live, photos, push, questions
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     init_db()
+    # Der Live-Kanal stellt aus dem Threadpool in diesen Loop zu
+    set_loop(asyncio.get_running_loop())
     task = asyncio.create_task(reminder_loop())
     yield
     task.cancel()
@@ -33,7 +36,7 @@ async def no_index(request: Request, call_next):
     return response
 
 
-for r in (auth.router, entries.router, photos.router, push.router, questions.router, book.router, gphotos.router):
+for r in (auth.router, entries.router, photos.router, push.router, questions.router, book.router, gphotos.router, live.router):
     app.include_router(r)
 
 

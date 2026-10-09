@@ -31,6 +31,11 @@ hinter deren Nginx. Server-Adresse steht nicht im Repo (GitHub-Secret `DEPLOY_HO
 - **Buch-PDF:** In `book/template.html` kein CSS-Grid über Seitenumbrüche (WeasyPrint stürzt ab), Fotos als `.ph` inline-block.
 - **Desktop ist eigenständig:** Ab 960 px Seitenleiste + Schreibtisch (`DesktopComposer`), ab 1280 px dritte Spalte (`RightRail`). Nicht einfach das Handy-Layout strecken.
 - Gemeinsame Eingabelogik liegt in `src/useComposer.ts` (Handy-Sheet und Desktop nutzen beide).
+- **Live-Updates:** Jede Änderung, die die andere Person sehen soll, ruft `live.publish(...)`
+  (siehe `routes/entries.py`, `routes/questions.py`). Verschickt werden nur Hinweise, nie Inhalte —
+  der Browser holt die Daten danach normal über die API, mit eigener Sitzungsprüfung.
+  `/api/stream` darf **nicht** durch `encode` laufen (Caddyfile) und braucht `X-Accel-Buffering: no`,
+  sonst halten Caddy bzw. Nginx die Ereignisse zurück.
 
 ## Deployment
 Verzeichnisse auf dem Server:
