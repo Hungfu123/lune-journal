@@ -137,6 +137,7 @@ const DesktopComposer = forwardRef<ComposerHandle, { me: Me; onPosted: (e: Entry
               onChange={c.setKind}
               options={[{ value: 'short', label: 'Kurz' }, { value: 'long', label: 'Tag erzählen' }]}
             />
+            <DateSuggestion c={c} />
             <MoodPicker c={c} />
             <EnergyPicker c={c} />
             <PlacePicker c={c} immer={me.ask_place} />

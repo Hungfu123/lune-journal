@@ -21,7 +21,9 @@ oder zum Drucken.
 
 **Den Tag festhalten.** Entweder *Kurz & knapp* (ein Satz) oder *Tag erzählen* (so lang ihr wollt),
 dazu eine Stimmung und beliebig viele Fotos aus Kamera, Galerie oder Google Fotos. Die App liest
-Aufnahmezeit und Ort aus den Foto-Metadaten und fragt nach: „Eintrag für diesen Tag anlegen?"
+Aufnahmezeit und Ort aus den Foto-Metadaten und fragt nach: „Eintrag für diesen Tag anlegen?" Der Tag
+steht beim Schreiben immer sichtbar da und lässt sich mit einem Tipp ändern — so könnt ihr auch später
+nachtragen, und Timeline, Monatsübersicht und Karte sortieren danach.
 
 **Einander Fragen stellen.** Eine Person fragt, die andere antwortet. Mit „Wir antworten beide" bleiben
 die Antworten verdeckt, bis beide fertig sind — niemand schreibt vom anderen ab. Beantwortete Fragen

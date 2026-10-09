@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { shortDate } from '../dates'
+import { shortDate, todayISO } from '../dates'
 import type { Composer } from '../useComposer'
 import { Camera, Close, Gallery, GPhotos } from './Icons'
 import { Spinner } from './Loading'
@@ -126,9 +126,36 @@ export function PhotoButtons({ c, camera = true }: { c: Composer; camera?: boole
   )
 }
 
+/**
+ * Der Tag, unter dem der Eintrag einsortiert wird — in Timeline, Monatsübersicht
+ * und auf der Karte. Steht immer sichtbar da, statt nur aufzutauchen, wenn ein
+ * Foto zufällig ein Datum mitbringt: sonst weiß man nie, welcher Tag es wird.
+ */
 export function DateSuggestion({ c }: { c: Composer }) {
+  const heute = todayISO()
+  const gewaehlt = c.entryDate ?? heute
   return (
-    <>
+    <div className="field">
+      <span>Tag</span>
+      <div className="date-row">
+        <label className="date-chip">
+          {c.entryDate ? shortDate(c.entryDate) : 'Heute'}
+          <input
+            type="date"
+            max={heute}
+            value={gewaehlt}
+            aria-label="Tag des Eintrags"
+            // Auf heute gesetzt heißt: kein eigenes Datum, der Eintrag folgt dem Tag
+            onChange={(e) => c.setEntryDate(e.target.value && e.target.value !== heute ? e.target.value : null)}
+          />
+        </label>
+        {c.entryDate && (
+          <button type="button" className="link-btn" onClick={() => c.setEntryDate(null)}>
+            Zurück auf heute
+          </button>
+        )}
+      </div>
+
       {c.showSuggestion && c.suggested && (
         <div className="suggest rise">
           <p>Die Fotos sind vom {shortDate(c.suggested)}. Eintrag für diesen Tag anlegen?</p>
@@ -138,12 +165,7 @@ export function DateSuggestion({ c }: { c: Composer }) {
           </div>
         </div>
       )}
-      {c.entryDate && (
-        <button type="button" className="chip" onClick={() => c.setEntryDate(null)} aria-label="Datum zurücksetzen">
-          Eintrag für den {shortDate(c.entryDate)} <Close />
-        </button>
-      )}
-    </>
+    </div>
   )
 }
 

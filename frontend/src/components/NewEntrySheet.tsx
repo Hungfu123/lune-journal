@@ -83,9 +83,9 @@ export default function NewEntrySheet({ open, onOpenChange, onPosted, shared, as
             <div className="field">
               <span>Wie war dein Tag?</span>
               <MoodPicker c={c} />
+            </div>
             <EnergyPicker c={c} />
             <PlacePicker c={c} immer={askPlace} />
-            </div>
           </div>
         </Drawer.Content>
       </Drawer.Portal>

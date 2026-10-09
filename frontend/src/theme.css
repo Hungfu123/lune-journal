@@ -421,6 +421,15 @@ input, textarea, select { font: inherit; color: inherit; }
   font-family: var(--font-body); font-size: 15px; }
 .comment-write .btn-small { flex-shrink: 0; }
 
+/* ---------- Tag des Eintrags ---------- */
+.date-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+/* Das echte Eingabefeld liegt unsichtbar über dem Chip: ein Tipp, nativer Kalender */
+.date-chip { position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+  padding: 0 16px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface);
+  font-size: 15px; font-weight: 700; cursor: pointer; }
+.date-chip input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; border: none; cursor: pointer; }
+.date-chip:focus-within { outline: 3px solid var(--me); outline-offset: 2px; }
+
 /* ---------- Ort ---------- */
 .place-row { display: flex; gap: 8px; align-items: stretch; }
 .place-row input { flex: 1; min-width: 0; }
