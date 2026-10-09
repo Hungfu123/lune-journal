@@ -29,6 +29,10 @@ hinter deren Nginx. Server-Adresse steht nicht im Repo (GitHub-Secret `DEPLOY_HO
 - **Themes:** 11 Themes in `theme.css` (`[data-theme=…]`), Liste auch in `types.ts`, `fonts.ts`, `SettingsSheet.tsx`, `BookSheet.tsx`, `backend/app/routes/auth.py` (THEMES) und `backend/app/book/themes.py`. Neue Themes überall eintragen und Kontrast (4.5:1) prüfen.
 - **Schriften:** selbst gehostet in `frontend/public/fonts` (kein Google Fonts). Fürs PDF statische Schnitte in `backend/app/book/fonts`.
 - **Buch-PDF:** In `book/template.html` kein CSS-Grid über Seitenumbrüche (WeasyPrint stürzt ab), Fotos als `.ph` inline-block.
+  Fotos am Eintrag haben nur `max-width`/`max-height` — nichts wird zugeschnitten. Zugeschnitten wird bewusst
+  nur auf dem Cover und in der Monats-Collage. Einträge mit Foto tragen `.mit-foto` und brechen nicht um
+  (`break-inside: avoid`), reine Texte dürfen umbrechen, damit keine Lücken entstehen. Die Stimmung steht
+  bewusst nicht im Buch, das Energielevel schon.
 - **Desktop ist eigenständig:** Ab 960 px Seitenleiste + Schreibtisch (`DesktopComposer`), ab 1280 px dritte Spalte (`RightRail`). Nicht einfach das Handy-Layout strecken.
 - Gemeinsame Eingabelogik liegt in `src/useComposer.ts` (Handy-Sheet und Desktop nutzen beide).
 - **Live-Updates:** Jede Änderung, die die andere Person sehen soll, ruft `live.publish(...)`

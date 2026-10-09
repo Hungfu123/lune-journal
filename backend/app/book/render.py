@@ -9,7 +9,7 @@ from PIL import Image
 from sqlmodel import Session, col, select
 
 from ..config import settings
-from ..models import Answer, Entry, Photo, Question, Reaction, User
+from ..models import Answer, Comment, Entry, Photo, Question, Reaction, User
 from .themes import book_theme
 
 BOOK_DIR = Path(__file__).parent
@@ -68,11 +68,14 @@ def build_context(db: Session, me: User, o: BookOptions) -> dict:
     ids = [e.id for e in entries]
     photos = defaultdict(list)
     hearts = defaultdict(int)
+    comments = defaultdict(list)
     if ids:
         for p in db.exec(select(Photo).where(col(Photo.entry_id).in_(ids)).order_by(Photo.position)).all():
             photos[p.entry_id].append(p)
         for r in db.exec(select(Reaction).where(col(Reaction.entry_id).in_(ids))).all():
             hearts[r.entry_id] += 1
+        for cm in db.exec(select(Comment).where(col(Comment.entry_id).in_(ids)).order_by(Comment.created_at)).all():
+            comments[cm.entry_id].append(cm)
 
     # Fragen, deren letzte Antwort im Zeitraum liegt
     qas_by_day = defaultdict(list)
@@ -110,13 +113,18 @@ def build_context(db: Session, me: User, o: BookOptions) -> dict:
                 day_entries = []
                 for e in by_day.get(d, []):
                     ph = photos[e.id]
-                    place = next((p.place_name for p in ph if p.place_name), None)
+                    place = e.place or next((p.place_name for p in ph if p.place_name), None)
                     if place:
                         all_places.add(place)
                     day_entries.append({
                         "author": users[e.user_id].name, "is_a": e.user_id == me.id, "kind": e.kind, "title": e.title,
-                        "text": e.text, "mood": e.mood, "hearts": hearts[e.id], "place": place,
-                        "photos": [u for u in (_jpeg(p.id, o.quality) for p in ph[:4]) if u],
+                        "text": e.text, "mood": e.mood, "energy": e.energy, "hearts": hearts[e.id], "place": place,
+                        # Alle Fotos, nicht nur die ersten vier — gedruckt soll nichts fehlen
+                        "photos": [u for u in (_jpeg(p.id, o.quality) for p in ph) if u],
+                        "comments": [
+                            {"name": users[cm.user_id].name if cm.user_id in users else "", "is_a": cm.user_id == me.id, "text": cm.text}
+                            for cm in comments[e.id]
+                        ],
                     })
                 days.append({"day": d.day, "weekday": WEEKDAYS[d.weekday()], "entries": day_entries, "qas": qas_by_day.get(d, [])})
 

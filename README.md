@@ -42,7 +42,8 @@ euer Monat in Zahlen und eine Fotowand.
 
 **Ein Buch daraus machen.** Zeitraum und Titel wählen, Design, A5 oder A4, Bildschirm- oder
 Druckqualität, optional 3 mm Beschnitt für die Druckerei. Mit Cover, Inhaltsverzeichnis, Monatsseiten,
-Fragen und Jahresrückblick. Vorher durchblättern, dann teilen oder drucken.
+Fragen und Jahresrückblick. Fotos stehen vollständig drin, nichts wird zugeschnitten; Kommentare und
+Energielevel stehen beim jeweiligen Eintrag. Vorher durchblättern, dann teilen oder drucken.
 
 **Standort nur, wenn er passt.** Hängen Fotos am Eintrag, holt die App auf Wunsch einmal euren Standort —
 praktisch, weil geteilte Fotos ihre Koordinaten oft verlieren. Ein Eintrag aus reinem Text bleibt unberührt.
