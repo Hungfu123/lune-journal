@@ -195,7 +195,12 @@ ob sie Bescheid geben darf, wenn der andere etwas postet.
 
 ### 5. Backups
 
-In `backup.sh` den Storage-Box-Zugang eintragen, einmal `restic init` laufen lassen, dann per Cron:
+**Auf dem Server** läuft bereits `deploy/taeglich-sichern.sh` per Cron (3:20 Uhr): es legt jeden Tag einen
+Stand der Datenbank unter `/opt/lune-journal/sicherungen/` ab (14 Tage) und spiegelt die Original-Fotos.
+Das fängt den häufigsten Fall ab — versehentlich gelöscht, Datenbank beschädigt, Deploy schiefgegangen.
+
+**Außer Haus** fehlt noch: geht die Festplatte kaputt, ist auch die Kopie weg. Dafür ist `backup.sh` da.
+Storage-Box-Zugang eintragen, einmal `restic init` laufen lassen, dann per Cron:
 
 ```
 30 3 * * * /opt/lune-journal/repo/backup.sh >> /opt/lune-journal/backup.log 2>&1
