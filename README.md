@@ -193,6 +193,9 @@ verdrahtet) und `DEPLOY_HOST` (Adresse des Servers — die steht bewusst nirgend
 Domain in Chrome öffnen → anmelden → Menü → *App installieren*. Nach dem ersten Eintrag fragt die App,
 ob sie Bescheid geben darf, wenn der andere etwas postet.
 
+Ob die Seite alle Bedingungen dafür erfüllt, sagt `python deploy/pwa-pruefen.py` — das prüft Manifest,
+Symbole, Service Worker und Teilen-Ziel gegen die laufende Seite.
+
 ### 5. Backups
 
 **Auf dem Server** läuft bereits `deploy/taeglich-sichern.sh` per Cron (3:20 Uhr): es legt jeden Tag einen
