@@ -1,0 +1,35 @@
+# Kein HTTPS hier: in Produktion terminiert der Nginx der Softball-App TLS
+# und reicht an diesen Container weiter (siehe deploy/nginx-lune.conf).
+:80 {
+	encode zstd gzip
+	header X-Robots-Tag "noindex, nofollow"
+
+	# API
+	handle /api/* {
+		reverse_proxy api:8000
+	}
+
+	# Fotos: Caddy fragt vor jeder Datei die API, ob ihr angemeldet seid
+	handle /media/* {
+		forward_auth api:8000 {
+			uri /api/auth/check
+		}
+		header Cache-Control "private, max-age=31536000, immutable"
+		root * /srv
+		file_server
+	}
+
+	# Service Worker nie cachen, damit Updates sofort ankommen
+	handle /sw.js {
+		header Cache-Control "no-cache"
+		root * /srv/app
+		file_server
+	}
+
+	# App
+	handle {
+		root * /srv/app
+		try_files {path} /index.html
+		file_server
+	}
+}

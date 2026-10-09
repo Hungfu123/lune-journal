@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>{{ title }}</title>
+<style>
+@font-face { font-family: 'Display'; src: url('fonts/{{ t.display_file }}'); }
+@font-face { font-family: 'Text'; src: url('fonts/Manrope-Regular.ttf'); font-weight: 400; }
+@font-face { font-family: 'Text'; src: url('fonts/Manrope-Bold.ttf'); font-weight: 700; }
+@font-face { font-family: 'Hand'; src: url('fonts/Caveat-Bold.ttf'); }
+
+:root { --paper: {{ t.paper }}; --ink: {{ t.ink }}; --muted: {{ t.muted }}; --line: {{ t.line }}; --soft: {{ t.soft }}; --me: {{ t.me }}; --her: {{ t.her }}; }
+
+@page {
+  size: {{ size }};
+  margin: 16mm 14mm 18mm 18mm;
+  background: var(--paper);
+  {% if bleed %}bleed: 3mm; marks: crop;{% endif %}
+  @top-center { content: string(month); font: 400 7.5pt 'Text'; color: var(--muted); letter-spacing: 0.04em; }
+  @bottom-center { content: counter(page); font: 700 8pt 'Text'; color: var(--muted); }
+}
+@page :left { margin: 16mm 18mm 18mm 14mm; }
+@page cover { margin: 0; @top-center { content: none; } @bottom-center { content: none; } }
+@page plain { @top-center { content: none; } @bottom-center { content: none; } }
+@page divider { @top-center { content: none; } }
+
+html { font-family: 'Text'; font-size: 9.6pt; line-height: 1.55; color: var(--ink); }
+body { margin: 0; }
+h1, h2, h3 { font-family: 'Display'; font-weight: normal; letter-spacing: {{ t.display_tracking }}; margin: 0; line-height: 1.08; }
+img { display: block; }
+
+/* ---------- Cover ---------- */
+.cover { page: cover; height: {{ page_h }}; width: {{ page_w }}; position: relative; overflow: hidden; background: var(--soft);{% if bleed %} margin: -3mm; height: calc({{ page_h }} + 6mm); width: calc({{ page_w }} + 6mm);{% endif %} }
+.cover-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.cover-card { position: absolute; left: 12mm; right: 12mm; bottom: 14mm; background: var(--paper); padding: 9mm 9mm 8mm; border-radius: {{ t.radius }}; }
+.cover-names { font-size: 8.5pt; font-weight: 700; color: var(--muted); letter-spacing: 0.06em; }
+.cover h1 { font-size: 34pt; margin: 2mm 0 1mm; }
+.cover-range { font-family: 'Hand'; font-size: 22pt; color: var(--me); line-height: 1; }
+.cover-dots { position: absolute; top: 9mm; right: 9mm; }
+.dot { display: inline-block; width: 4mm; height: 4mm; border-radius: 50%; background: var(--me); }
+.dot + .dot { background: var(--her); margin-left: -1.2mm; }
+
+/* ---------- Inhalt ---------- */
+.toc { page: plain; break-before: page; padding-top: 18mm; }
+.toc h2 { font-size: 24pt; margin-bottom: 8mm; }
+.toc ol { list-style: none; padding: 0; margin: 0; }
+.toc li { padding: 2.4mm 0; border-bottom: 0.5pt solid var(--line); }
+.toc a { display: block; color: var(--ink); text-decoration: none; font-size: 11pt; }
+.toc a::after { content: target-counter(attr(href), page); float: right; font-weight: 700; }
+.toc .n { color: var(--muted); font-size: 8.5pt; margin-left: 2.5mm; }
+
+/* ---------- Monat ---------- */
+.month { page: divider; break-before: page; display: flex; flex-direction: column; height: calc({{ page_h }} - 40mm); }
+.month h2 { string-set: month content(); font-size: 40pt; color: var(--me); }
+.month-year { font-family: 'Hand'; font-size: 20pt; color: var(--muted); margin-top: 1mm; }
+.month-stats { margin-top: 5mm; font-size: 8.5pt; color: var(--muted); }
+.month-stats b { color: var(--ink); }
+.month-mosaic { margin-top: auto; padding-top: 5mm; font-size: 0; break-inside: avoid; }
+.month-quote { margin-top: 6mm; padding: 4mm 5mm; background: var(--soft); border-radius: {{ t.radius }}; }
+.month-quote span { font-size: 7.5pt; font-weight: 700; color: var(--muted); }
+.month-quote p { margin: 1mm 0 0; font-family: 'Hand'; font-size: 17pt; line-height: 1.1; }
+
+/* ---------- Timeline ---------- */
+.day { position: relative; padding-left: 17mm; }
+.date { position: absolute; left: 0; top: 0; width: 13mm; text-align: right; padding-top: 0.6mm; }
+.date b { display: block; font-family: 'Display'; font-size: 17pt; line-height: 1; }
+.date span { font-size: 7pt; color: var(--muted); }
+.entries { border-left: 0.8pt solid var(--line); padding: 0 0 5mm 5mm; }
+.entry { position: relative; margin-bottom: 5mm; break-inside: avoid; }
+.entry::before { content: ''; position: absolute; left: -6.55mm; top: 1.4mm; width: 2.6mm; height: 2.6mm; border-radius: 50%; background: var(--c); border: 0.8pt solid var(--paper); }
+.who-me { --c: var(--me); } .who-her { --c: var(--her); }
+.meta { font-size: 7.5pt; color: var(--muted); }
+.meta b { color: var(--c); }
+.entry h3 { font-size: 13pt; margin: 1.2mm 0 1mm; }
+.hand { font-family: 'Hand'; font-size: 17pt; line-height: 1.08; color: var(--c); margin: 1mm 0 0; }
+.text { margin: 1mm 0 0; white-space: pre-line; hyphens: auto; text-align: left; }
+.place { font-size: 7.5pt; color: var(--muted); margin-top: 1.4mm; }
+.hearts { color: var(--me); font-weight: 700; }
+
+.photos { margin-top: 2.5mm; font-size: 0; }
+/* WeasyPrint-sicheres Raster ohne CSS-Grid: volle Breite oder zwei Hälften */
+.ph { display: inline-block; vertical-align: top; object-fit: cover; border-radius: calc({{ t.radius }} * 0.5); margin-bottom: 1.6mm; }
+.ph.full { width: 100%; height: 46mm; }
+.ph.only { width: 100%; height: 64mm; }
+.ph.l, .ph.r { width: calc(50% - 0.8mm); height: 32mm; }
+.ph.l { margin-right: 1.6mm; }
+.month-mosaic .ph.full { height: 58mm; }
+.month-mosaic .ph.l, .month-mosaic .ph.r { height: 42mm; }
+{% if t.key == 'polaroid' %}
+.photos .ph { border: 2.2mm solid #fff; border-bottom-width: 7mm; border-radius: 0; box-shadow: 0 0 0 0.3pt #d8d8d4; }
+{% endif %}
+
+/* ---------- Fragen ---------- */
+.qa { break-inside: avoid; margin: 0 0 5mm 17mm; padding: 4mm 5mm; background: var(--soft); border-radius: {{ t.radius }}; }
+.qa-label { font-size: 7pt; font-weight: 700; color: var(--muted); }
+.qa h3 { font-size: 12pt; margin: 1mm 0 2mm; }
+.qa-a { margin-top: 1.5mm; }
+.qa-a b { font-size: 7.5pt; }
+.qa-a p { margin: 0; font-family: 'Hand'; font-size: 15pt; line-height: 1.08; }
+
+/* ---------- Schluss ---------- */
+.outro { page: plain; break-before: page; padding-top: 20mm; }
+.outro h2 { font-size: 28pt; margin-bottom: 8mm; }
+.stats { font-size: 0; }
+.stat { display: inline-block; vertical-align: top; width: calc(50% - 1.5mm); box-sizing: border-box; margin: 0 3mm 3mm 0; background: var(--soft); border-radius: {{ t.radius }}; padding: 4mm 5mm; }
+.stat:nth-child(even) { margin-right: 0; }
+.stat b { display: block; font-family: 'Display'; font-size: 22pt; line-height: 1.05; color: var(--me); }
+.stat span { font-size: 8pt; color: var(--muted); }
+.outro-note { margin-top: 12mm; font-family: 'Hand'; font-size: 20pt; line-height: 1.1; color: var(--her); }
+</style>
+</head>
+<body>
+
+<section class="cover">
+  {% if cover %}<img class="cover-photo" src="{{ cover }}">{% endif %}
+  <div class="cover-dots"><span class="dot"></span><span class="dot"></span></div>
+  <div class="cover-card">
+    <div class="cover-names">{{ names }}</div>
+    <h1>{{ title }}</h1>
+    <div class="cover-range">{{ range_label }}</div>
+  </div>
+</section>
+
+{% if months|length > 1 %}
+<section class="toc">
+  <h2>Inhalt</h2>
+  <ol>
+  {% for m in months %}<li><a href="#m-{{ m.key }}">{{ m.name }} {{ m.year }}<span class="n">{{ m.count }} Einträge</span></a></li>{% endfor %}
+  </ol>
+</section>
+{% endif %}
+
+{% for m in months %}
+<section class="month" id="m-{{ m.key }}">
+  <h2>{{ m.name }}</h2>
+  <div class="month-year">{{ m.year }}</div>
+  <div class="month-stats"><b>{{ m.count }}</b> Einträge · <b>{{ m.photo_count }}</b> Fotos{% if m.places %} · <b>{{ m.places }}</b> Orte{% endif %}</div>
+  {% if m.highlight %}
+  <div class="month-quote"><span>{{ m.highlight.label }}</span><p>{{ m.highlight.text }}</p></div>
+  {% endif %}
+  {% if m.mosaic %}<div class="month-mosaic">{% for src in m.mosaic %}<img class="ph {{ layouts[m.mosaic|length][loop.index0] }}" src="{{ src }}">{% endfor %}</div>{% endif %}
+</section>
+
+{% for d in m.days %}
+  {% if d.entries %}
+  <div class="day">
+    <div class="date"><b>{{ d.day }}</b><span>{{ d.weekday }}</span></div>
+    <div class="entries">
+      {% for e in d.entries %}
+      <article class="entry {{ 'who-me' if e.is_a else 'who-her' }}">
+        <div class="meta"><b>{{ e.author }}</b>{% if e.mood %} · fühlte sich {{ e.mood }}{% endif %}{% if e.hearts %} · <span class="hearts">♥ {{ e.hearts }}</span>{% endif %}</div>
+        {% if e.kind == 'long' and e.title %}<h3>{{ e.title }}</h3>{% endif %}
+        {% if e.text %}{% if e.kind == 'short' %}<p class="hand">{{ e.text }}</p>{% else %}<p class="text">{{ e.text }}</p>{% endif %}{% endif %}
+        {% if e.photos %}<div class="photos">{% for src in e.photos[:4] %}<img class="ph {{ layouts[e.photos|length][loop.index0] }}" src="{{ src }}">{% endfor %}</div>{% endif %}
+        {% if e.place %}<div class="place">{{ e.place }}</div>{% endif %}
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  {% for q in d.qas %}
+  <div class="qa">
+    <div class="qa-label">{{ q.label }}</div>
+    <h3>{{ q.text }}</h3>
+    {% for a in q.answers %}<div class="qa-a {{ 'who-me' if a.is_a else 'who-her' }}"><b style="color: var(--c)">{{ a.name }}</b><p>{{ a.text }}</p></div>{% endfor %}
+  </div>
+  {% endfor %}
+{% endfor %}
+{% endfor %}
+
+<section class="outro">
+  <h2>Euer {{ 'Jahr' if months|length >= 10 else 'Zeitraum' }} in Zahlen</h2>
+  <div class="stats">
+    <div class="stat"><b>{{ totals.entries }}</b><span>Einträge</span></div>
+    <div class="stat"><b>{{ totals.photos }}</b><span>Fotos</span></div>
+    <div class="stat"><b>{{ totals.hearts }}</b><span>Herzen</span></div>
+    <div class="stat"><b>{{ totals.questions }}</b><span>beantwortete Fragen</span></div>
+    {% if totals.places %}<div class="stat"><b>{{ totals.places }}</b><span>verschiedene Orte</span></div>{% endif %}
+    {% if totals.streak > 1 %}<div class="stat"><b>{{ totals.streak }}</b><span>Tage in Folge geschrieben</span></div>{% endif %}
+  </div>
+  {% if totals.best_month %}<p class="outro-note">Am meisten erlebt im {{ totals.best_month }}.</p>{% endif %}
+</section>
+
+</body>
+</html>

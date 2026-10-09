@@ -1,0 +1,25 @@
+# Produktion: die App läuft neben der Softball-App auf demselben Server.
+# Dort hält der Nginx-Container von Softball Port 80/443 und die Zertifikate,
+# deshalb macht Caddy hier kein HTTPS, sondern lauscht nur intern auf :80.
+# Das externe Netz "proxy" verbindet beide Compose-Projekte, damit der Nginx
+# den Container unter dem Namen "lune-web" erreicht.
+#
+# Fotos und Datenbank liegen außerhalb des Git-Klons unter /opt/lune-journal/data,
+# damit ein kaputter Checkout nie die Daten mitnimmt.
+services:
+  api:
+    container_name: lune-api
+    volumes:
+      - /opt/lune-journal/data:/data
+
+  web:
+    container_name: lune-web
+    volumes:
+      - /opt/lune-journal/data/media:/srv/media:ro
+    networks:
+      - default
+      - proxy
+
+networks:
+  proxy:
+    external: true

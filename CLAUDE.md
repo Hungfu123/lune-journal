@@ -1,0 +1,67 @@
+# Lune Journal
+
+Privates Tagebuch für zwei Personen. Mobile-first PWA, beide nutzen Google Pixel (Android, Chrome).
+Produktion: https://lune-journal.duckdns.org auf demselben Hetzner-VPS wie die Softball-App,
+hinter deren Nginx. Server-Adresse steht nicht im Repo (GitHub-Secret `DEPLOY_HOST`). Auto-Deploy per GitHub Action auf `main`.
+
+## Stack
+- `backend/`: FastAPI, SQLModel/SQLite (WAL), Pillow, WeasyPrint (Buch-PDF), pypdfium2 (Buchvorschau), pywebpush, httpx
+- `frontend/`: React 18 + Vite + TypeScript, Vaul (Sheets), Sonner (Toasts), exifr, vite-plugin-pwa (injectManifest, `src/sw.ts`)
+- `frontend/Caddyfile`: App, `/api` → FastAPI, `/media` über `forward_auth` geschützt. **Kein HTTPS** —
+  TLS macht der Nginx der Softball-App, Caddy lauscht nur auf `:80`.
+- Keine Tailwind, kein UI-Framework: Styles in `frontend/src/theme.css` mit CSS-Variablen pro Theme
+
+## Befehle
+- Backend-Tests: `cd backend && pytest -q` (15 Tests, müssen grün bleiben)
+- Browser-Test: `python backend/tests/e2e_browser.py` (Anleitung im Dateikopf, 21 Abläufe Handy + Desktop)
+- Frontend: `cd frontend && npm ci && npm run build` (inkl. `tsc -b`)
+- Dev: `uvicorn app.main:app --reload` in `backend/`, `npm run dev` in `frontend/` (Proxy auf :8000)
+- Deploy: Push auf `main`, oder manuell `ssh root@<vps> "/opt/lune-journal/deploy.sh"`
+
+## Regeln
+- **Sprache:** Alle Texte in der App auf Deutsch, Satzanfang groß, aktiv, kurz. Fehlertexte sagen, was passiert ist und was zu tun ist.
+- **Zugang:** Nur die zwei Adressen aus `ALLOWED_EMAILS`. Jeder neue Endpunkt braucht `Depends(current_user)`. Bilder nie als öffentlichen Ordner ausliefern.
+- **Fotos:** Ausgelieferte WebP-Bilder enthalten keine EXIF/GPS-Daten. Originale bleiben in `data/originals` für den Druck.
+- **Animationen nach Emil Kowalski:**
+  - Häufige Aktionen (Navigation, Filter, Herzen) nicht oder kaum animieren, Tastatur-Aktionen nie.
+  - Nur `transform`/`opacity` (Ausnahme: Akkordeon-Höhe, `clip-path`). Kurven aus `theme.css`: `--ease-out`, `--ease-in-out`, `--ease-drawer`.
+  - UI unter 300 ms, Hover nur in `@media (hover: hover) and (pointer: fine)`, `prefers-reduced-motion` immer mitliefern.
+- **Themes:** 11 Themes in `theme.css` (`[data-theme=…]`), Liste auch in `types.ts`, `fonts.ts`, `SettingsSheet.tsx`, `BookSheet.tsx`, `backend/app/routes/auth.py` (THEMES) und `backend/app/book/themes.py`. Neue Themes überall eintragen und Kontrast (4.5:1) prüfen.
+- **Schriften:** selbst gehostet in `frontend/public/fonts` (kein Google Fonts). Fürs PDF statische Schnitte in `backend/app/book/fonts`.
+- **Buch-PDF:** In `book/template.html` kein CSS-Grid über Seitenumbrüche (WeasyPrint stürzt ab), Fotos als `.ph` inline-block.
+- **Desktop ist eigenständig:** Ab 960 px Seitenleiste + Schreibtisch (`DesktopComposer`), ab 1280 px dritte Spalte (`RightRail`). Nicht einfach das Handy-Layout strecken.
+- Gemeinsame Eingabelogik liegt in `src/useComposer.ts` (Handy-Sheet und Desktop nutzen beide).
+
+## Deployment
+Verzeichnisse auf dem Server:
+
+| Pfad | Inhalt |
+|------|--------|
+| `/opt/lune-journal/repo/` | Git-Klon samt `.env` (gitignored) |
+| `/opt/lune-journal/data/` | Fotos, SQLite-DB, VAPID-Schlüssel — **außerhalb** des Klons |
+| `/opt/lune-journal/deploy.sh` | Kopie von `deploy.sh` aus dem Repo |
+| `/opt/softball/docker-compose.yml` | mountet `deploy/nginx-lune.conf` in den Nginx-Container |
+
+Compose immer mit beiden Dateien: `-f docker-compose.yml -f docker-compose.prod.yml`.
+Das Override setzt die Container-Namen (`lune-api`, `lune-web`), legt die Daten nach
+`/opt/lune-journal/data` und hängt `web` ins externe Docker-Netz `proxy`, über das der Nginx
+der Softball-App den Container unter `lune-web` erreicht.
+
+Zertifikat: `certbot certonly --standalone`, dafür muss der Nginx-Container kurz stehen —
+genau wie bei den beiden anderen Domains auf dem Server.
+
+## Noch nicht mit echten Konten getestet
+- Google-Login (braucht echte `GOOGLE_CLIENT_ID`)
+- Google Fotos Picker (Photos Picker API in der Cloud Console aktivieren)
+- Push auf echten Pixeln
+
+## Screenshots
+`docs/screenshots/` zeigt Demo-Daten, keine echten Einträge. Neu erzeugen: Backend mit leerem
+`DATA_DIR` starten, Demo-Daten anlegen, `npx vite preview --port 4173`, dann mit Playwright
+abfotografieren. Echte Fotos oder echte Texte gehören nicht ins Repo.
+
+## Commits
+Keine `Co-Authored-By`-Zeilen (wie im Softball-Repo).
+
+## Nächste Ideen
+Teilen aus Google Fotos (Web Share Target), Lese-Modus, Ruhezeiten für Push, eigenes Cover-Foto fürs Buch, Videos, Sprachnotizen, Garmin-Daten an Lauf-Einträgen, Karte.

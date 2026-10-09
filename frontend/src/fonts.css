@@ -1,0 +1,8 @@
+/* Selbst gehostete Schriften: kein Google-Aufruf, offline verfügbar.
+   Der Browser lädt eine Datei erst, wenn ein Theme sie wirklich benutzt. */
+@font-face { font-family: 'Manrope'; src: url('/fonts/Manrope.woff2') format('woff2'); font-weight: 200 800; font-display: swap; }
+@font-face { font-family: 'Caveat'; src: url('/fonts/Caveat.woff2') format('woff2'); font-weight: 400 700; font-display: swap; }
+@font-face { font-family: 'Bricolage Grotesque'; src: url('/fonts/Bricolage.woff2') format('woff2'); font-weight: 200 800; font-display: swap; }
+@font-face { font-family: 'Fraunces'; src: url('/fonts/Fraunces.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: 'DM Serif Display'; src: url('/fonts/DMSerifDisplay.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Fredoka'; src: url('/fonts/Fredoka.woff2') format('woff2'); font-weight: 300 700; font-display: swap; }

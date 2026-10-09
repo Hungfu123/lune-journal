@@ -1,0 +1,26 @@
+# Projektname festnageln: sonst heißt das Projekt auf dem Server nach dem
+# Klon-Verzeichnis ("repo") und die Images ebenso.
+name: lune-journal
+
+services:
+  api:
+    build: ./backend
+    env_file: .env
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        VITE_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+    # Nur auf localhost: in Produktion kommt der Verkehr über den Nginx der
+    # Softball-App (TLS), nicht direkt von außen.
+    ports:
+      - "127.0.0.1:8081:80"
+    volumes:
+      - ./data/media:/srv/media:ro
+    depends_on:
+      - api
+    restart: unless-stopped

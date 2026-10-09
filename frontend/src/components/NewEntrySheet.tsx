@@ -1,0 +1,73 @@
+import { Drawer } from 'vaul'
+import { useComposer } from '../useComposer'
+import { useSheetDirection } from '../useMedia'
+import type { Entry } from '../types'
+import { DateSuggestion, MoodPicker, PhotoButtons, PhotoStrip } from './ComposerParts'
+import Segmented from './Segmented'
+
+interface Props {
+  open: boolean
+  onOpenChange: (o: boolean) => void
+  onPosted: (e: Entry) => void
+}
+
+/** Handy: neuer Eintrag als Sheet von unten. */
+export default function NewEntrySheet({ open, onOpenChange, onPosted }: Props) {
+  const direction = useSheetDirection()
+  const c = useComposer((e) => {
+    onOpenChange(false)
+    onPosted(e)
+  })
+
+  return (
+    <Drawer.Root direction={direction} open={open} onOpenChange={onOpenChange} repositionInputs={false}>
+      <Drawer.Portal>
+        <Drawer.Overlay className="sheet-overlay" />
+        <Drawer.Content className="sheet sheet-tall" aria-describedby={undefined}>
+          <div className="sheet-handle" />
+          <div className="sheet-bar">
+            <button type="button" className="link-btn" onClick={() => onOpenChange(false)}>Abbrechen</button>
+            <Drawer.Title className="sheet-bar-title">Neuer Eintrag</Drawer.Title>
+            <button type="button" className="btn-primary btn-small" disabled={!c.canPost} onClick={c.post}>
+              {c.posting ? 'Postet …' : 'Posten'}
+            </button>
+          </div>
+
+          <div className="sheet-body">
+            <Segmented
+              label="Art des Eintrags"
+              value={c.kind}
+              onChange={c.setKind}
+              options={[{ value: 'short', label: 'Kurz & knapp' }, { value: 'long', label: 'Tag erzählen' }]}
+            />
+            {c.kind === 'long' && (
+              <label className="field">
+                <span>Titel</span>
+                <input className="input-title" value={c.title} onChange={(e) => c.setTitle(e.target.value)} placeholder="Sonntag am Rhein" />
+              </label>
+            )}
+            <label className="field">
+              <span>{c.kind === 'long' ? 'Erzähl von deinem Tag' : 'Ein Satz zu heute'}</span>
+              <textarea
+                className={c.kind === 'long' ? 'input-long' : 'input-hand'}
+                value={c.text}
+                onChange={(e) => c.setText(e.target.value)}
+                placeholder={c.kind === 'long' ? 'Was ist passiert? Was war schön, was lustig?' : 'Heute war …'}
+              />
+            </label>
+            <div className="field">
+              <span>Fotos</span>
+              <PhotoStrip c={c} />
+              <PhotoButtons c={c} />
+            </div>
+            <DateSuggestion c={c} />
+            <div className="field">
+              <span>Wie war dein Tag?</span>
+              <MoodPicker c={c} />
+            </div>
+          </div>
+        </Drawer.Content>
+      </Drawer.Portal>
+    </Drawer.Root>
+  )
+}
