@@ -9,7 +9,7 @@ from .db import init_db
 from .limiter import limiter
 from .live import set_loop
 from .reminders import reminder_loop
-from .routes import auth, book, entries, gphotos, live, photos, push, questions
+from .routes import auth, book, comments, entries, gphotos, live, photos, push, questions
 
 
 @asynccontextmanager
@@ -36,7 +36,7 @@ async def no_index(request: Request, call_next):
     return response
 
 
-for r in (auth.router, entries.router, photos.router, push.router, questions.router, book.router, gphotos.router, live.router):
+for r in (auth.router, entries.router, photos.router, push.router, questions.router, book.router, gphotos.router, live.router, comments.router):
     app.include_router(r)
 
 

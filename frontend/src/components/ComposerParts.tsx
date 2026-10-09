@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { shortDate } from '../dates'
 import type { Composer } from '../useComposer'
 import { Camera, Close, Gallery, GPhotos } from './Icons'
+import { Spinner } from './Loading'
 
 export const MOODS = ['müde', 'okay', 'gut', 'super']
 
@@ -74,7 +75,7 @@ export function PlacePicker({ c, immer }: { c: Composer; immer: boolean }) {
           onChange={(e) => c.setPlace(e.target.value)}
         />
         <button type="button" className="btn-secondary btn-small" disabled={c.locating} onClick={c.useStandort}>
-          {c.locating ? 'Suche …' : 'Standort'}
+          {c.locating ? <><Spinner label="Standort wird gesucht" /> Suche …</> : 'Standort'}
         </button>
       </div>
     </label>

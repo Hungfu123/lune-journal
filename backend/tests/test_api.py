@@ -319,3 +319,39 @@ def test_ask_place_setting(as_user):
     c = as_user("hung")
     assert c.get("/api/auth/me").json()["ask_place"] is False
     assert c.patch("/api/auth/me", json={"ask_place": True}).json()["ask_place"] is True
+
+
+# ---------- Kommentare ----------
+
+def test_comments(as_user, no_network):
+    # as_user liefert immer denselben Client, nur mit anderem Cookie —
+    # vor jedem Schritt also neu umschalten.
+    c = as_user("hung")
+    eintrag = c.post("/api/entries", json={"kind": "short", "text": "Erster Lauf"}).json()
+    assert eintrag["comments"] == 0
+
+    # Unter den eigenen Eintrag darf man schreiben
+    liste = c.post(f"/api/entries/{eintrag['id']}/comments", json={"text": "War härter als gedacht."}).json()
+    assert [x["text"] for x in liste] == ["War härter als gedacht."]
+    assert liste[0]["mine"] is True
+    von_hung = liste[0]["id"]
+
+    c = as_user("lea")
+    liste = c.post(f"/api/entries/{eintrag['id']}/comments", json={"text": "Stark!"}).json()
+    assert len(liste) == 2 and liste[1]["author"]["name"] == "Lea" and liste[0]["mine"] is False
+    # Fremde Kommentare bleiben stehen
+    assert c.delete(f"/api/comments/{von_hung}").status_code == 404
+
+    c = as_user("hung")
+    assert len(c.delete(f"/api/comments/{von_hung}").json()) == 1
+    assert c.get(f"/api/entries/{eintrag['id']}").json()["comments"] == 1
+    assert c.post(f"/api/entries/{eintrag['id']}/comments", json={"text": "   "}).status_code == 422
+    assert c.post("/api/entries/999999/comments", json={"text": "x"}).status_code == 404
+
+
+def test_deleting_entry_removes_comments(as_user, no_network):
+    c = as_user("hung")
+    e = c.post("/api/entries", json={"kind": "short", "text": "weg damit"}).json()
+    c.post(f"/api/entries/{e['id']}/comments", json={"text": "bleibt nicht"})
+    assert c.delete(f"/api/entries/{e['id']}").status_code == 200
+    assert c.get(f"/api/entries/{e['id']}/comments").status_code == 404

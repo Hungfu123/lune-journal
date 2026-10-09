@@ -4,7 +4,8 @@ import { useSheetDirection } from '../useMedia'
 import { dayLabel } from '../dates'
 import type { Entry } from '../types'
 import HoldToDelete from './HoldToDelete'
-import { Heart, More, Pin } from './Icons'
+import Comments from './Comments'
+import { Heart, More, Pin, Speech } from './Icons'
 
 interface Props {
   entry: Entry
@@ -55,6 +56,8 @@ export default function EntryCard({ entry, fresh, highlight, onHeart, onDelete, 
   const direction = useSheetDirection()
   const [expanded, setExpanded] = useState(false)
   const [menu, setMenu] = useState(false)
+  const [showComments, setShowComments] = useState(false)
+  const [count, setCount] = useState(entry.comments)
   const long = entry.kind === 'long'
   const tooLong = long && entry.text.length > 260
 
@@ -67,10 +70,7 @@ export default function EntryCard({ entry, fresh, highlight, onHeart, onDelete, 
         <span className="avatar" aria-hidden="true">{entry.author.name.charAt(0)}</span>
         <div className="card-meta">
           <strong>{entry.author.name}</strong>
-          <span>
-            {dayLabel(entry.date)}
-            {entry.place_name && `, ${entry.place_name}`}
-          </span>
+          <span>{dayLabel(entry.date)}</span>
         </div>
         {entry.mood && (
           <span className="mood-tag" data-mood={entry.mood}>
@@ -127,7 +127,19 @@ export default function EntryCard({ entry, fresh, highlight, onHeart, onDelete, 
           <Heart filled={entry.hearted} />
           {entry.hearts > 0 ? entry.hearts : 'Herz'}
         </button>
+        <button
+          type="button"
+          className="pill"
+          aria-expanded={showComments}
+          aria-label={showComments ? 'Kommentare zuklappen' : 'Kommentare anzeigen'}
+          onClick={() => setShowComments((v) => !v)}
+        >
+          <Speech />
+          {count > 0 ? count : 'Kommentar'}
+        </button>
       </footer>
+
+      {showComments && <Comments entryId={entry.id} onCount={setCount} />}
 
       <Drawer.Root direction={direction} open={menu} onOpenChange={setMenu}>
         <Drawer.Portal>

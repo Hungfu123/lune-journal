@@ -294,6 +294,42 @@ input, textarea, select { font: inherit; color: inherit; }
 .mood-tag[data-mood='gut'] { --stimmung: var(--stimmung-gut); }
 .mood-tag[data-mood='super'] { --stimmung: var(--me); }
 
+/* ---------- Ladezustände ---------- */
+/* Nur die Deckkraft pulsiert — kein Verschieben von Hintergründen, das wäre
+   Bewegung ohne Aussage. */
+.skeleton { display: block; background: color-mix(in srgb, var(--line) 70%, var(--surface)); border-radius: 8px;
+  animation: skeleton-puls 1.4s var(--ease-in-out) infinite; }
+@keyframes skeleton-puls { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+.feed-skeleton { display: grid; gap: 14px; }
+.skeleton-card { display: grid; gap: 10px; }
+.skeleton-head { display: flex; align-items: center; gap: 10px; }
+.skeleton-lines { flex: 1; display: grid; gap: 6px; }
+
+.spinner { display: inline-grid; place-items: center; }
+.spinner svg { animation: spinner-dreht 800ms linear infinite; }
+@keyframes spinner-dreht { to { transform: rotate(360deg); } }
+
+/* ---------- Kommentare ---------- */
+.comments { display: grid; gap: 10px; margin-top: 12px; padding-top: 12px; border-top: 1.5px dashed var(--line);
+  opacity: 1; transform: none; transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out); }
+@starting-style { .comments { opacity: 0; transform: translateY(-4px); } }
+.comments-hint { margin: 0; font-size: 14px; color: var(--muted); }
+.comment { --c: var(--her); --c-on: var(--her-on); padding: 10px 12px; border-radius: 16px;
+  background: color-mix(in srgb, var(--c) 8%, var(--surface)); border: 1.5px solid color-mix(in srgb, var(--c) 22%, var(--line)); }
+.comment.is-me { --c: var(--me); --c-on: var(--me-on); }
+.comment-head { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.comment-head strong { color: var(--c); }
+.comment-head span { color: var(--muted); }
+.comment-del { position: relative; margin-left: auto; width: 28px; height: 28px; display: grid; place-items: center;
+  border-radius: 50%; color: var(--muted); }
+.comment-del::before { content: ''; position: absolute; inset: -8px; }
+.comment p { margin: 4px 0 0; font-size: 15px; line-height: 1.45; overflow-wrap: anywhere; }
+.comment-write { display: flex; gap: 8px; align-items: flex-end; }
+.comment-write textarea { flex: 1; min-width: 0; min-height: 44px; max-height: 160px; resize: none; overflow-y: auto;
+  border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 16px; padding: 11px 14px;
+  font-family: var(--font-body); font-size: 15px; }
+.comment-write .btn-small { flex-shrink: 0; }
+
 /* ---------- Ort ---------- */
 .place-row { display: flex; gap: 8px; align-items: stretch; }
 .place-row input { flex: 1; min-width: 0; }
@@ -304,8 +340,12 @@ input, textarea, select { font: inherit; color: inherit; }
 /* Zehn Felder, die sich füllen — angelehnt an eine Energieleiste im Spiel,
    aber ohne Blinken: gefüllt heißt Farbe, leer heißt Umriss. */
 .energy { display: flex; gap: 4px; }
-.energy-cell { flex: 1; height: 34px; min-width: 0; border-radius: 7px; border: 1.5px solid var(--line);
-  background: var(--surface); transition: background-color 140ms var(--ease-out), border-color 140ms var(--ease-out); }
+/* Kein Übergang: Antippen ist direkte Manipulation, da will man die Antwort
+   sofort sehen — und Farbübergänge sind ohnehin nicht erlaubt. */
+.energy-cell { position: relative; flex: 1; height: 34px; min-width: 0; border-radius: 7px;
+  border: 1.5px solid var(--line); background: var(--surface); }
+/* Sichtbar 34 px hoch, treffbar 44 px — sonst zu klein für Daumen */
+.energy-cell::before { content: ''; position: absolute; inset: -5px -1px; }
 .energy-cell[data-an] { background: var(--me); border-color: var(--me); }
 .energy-value { color: var(--me); }
 .energy-hint { font-weight: 400; font-style: normal; color: color-mix(in srgb, var(--muted) 75%, transparent); }
@@ -342,6 +382,12 @@ input, textarea, select { font: inherit; color: inherit; }
   .rise { transition: opacity 200ms ease; }
   @starting-style { .rise { transform: none; } }
   .upload-progress[data-fertig='true'] span { animation: none; opacity: 0.7; }
+  .comments { transition: opacity 150ms ease; }
+  /* Platzhalter dürfen ruhig stehen, der Spinner dreht langsamer weiter —
+     ohne Bewegung sagt er gar nichts mehr. */
+  .skeleton { animation: none; opacity: 0.75; }
+  .spinner svg { animation-duration: 2s; }
+  @starting-style { .comments { transform: none; } }
 }
 
 /* ---------- Fragen ---------- */
@@ -580,7 +626,8 @@ button.avatars { padding: 0; }
   .card:hover { border-color: color-mix(in srgb, var(--c) 30%, var(--line)); }
   .pill:hover, .btn-secondary:hover, .mood:hover, .month-tile:hover:not(:disabled), .book-theme:hover, .idea:hover { background: var(--soft); }
   .btn-primary:hover:not(:disabled) { background: color-mix(in srgb, var(--me) 88%, var(--ink)); }
-  .icon-btn:hover, .link-btn:hover { color: var(--ink); }
+  .icon-btn:hover, .link-btn:hover, .comment-del:hover { color: var(--ink); }
+  .energy-cell:not([data-an]):hover { background: var(--soft); }
   .segmented > button:hover { color: var(--ink); }
 }
 

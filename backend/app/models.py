@@ -68,6 +68,14 @@ class Reaction(SQLModel, table=True):
     created_at: datetime = Field(default_factory=utcnow)
 
 
+class Comment(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    entry_id: int = Field(foreign_key="entry.id", index=True)
+    user_id: int = Field(foreign_key="user.id")
+    text: str
+    created_at: datetime = Field(default_factory=utcnow)
+
+
 class PushSubscription(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id", index=True)

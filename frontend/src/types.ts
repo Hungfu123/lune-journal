@@ -35,6 +35,7 @@ export interface Entry {
   mine: boolean
   photos: Photo[]
   place_name: string | null
+  comments: number
   hearts: number
   hearted: boolean
 }
@@ -51,4 +52,12 @@ export interface Question {
   open_for_me: boolean
   waiting_on: string[]
   answers: { user: { id: number; name: string }; text: string }[]
+}
+
+export interface Comment {
+  id: number
+  text: string
+  created_at: string
+  author: { id: number; name: string }
+  mine: boolean
 }

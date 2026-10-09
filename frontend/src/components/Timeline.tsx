@@ -16,6 +16,7 @@ import EntryCard from './EntryCard'
 import BookSheet from './BookSheet'
 import DesktopComposer, { type ComposerHandle } from './DesktopComposer'
 import Lightbox from './Lightbox'
+import { FeedSkeleton } from './Loading'
 import RightRail from './RightRail'
 import { Book, Chevron, Plus } from './Icons'
 import MonthGrid from './MonthGrid'
@@ -301,6 +302,7 @@ export default function Timeline({ me, onMeChange }: { me: Me; onMeChange: (m: M
             <QACard key={`q${item.q.id}`} q={item.q} me={me} fresh={item.q.id === freshQ} />
           ),
         )}
+        {entries === null && <FeedSkeleton />}
         {entries && feed.length === 0 && (
           <div className="empty">
             <p>{emptyText}</p>

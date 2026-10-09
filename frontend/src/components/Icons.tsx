@@ -17,6 +17,9 @@ export const Camera = () => (
 export const Gallery = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" {...base}><rect x="3" y="4" width="18" height="16" rx="3" /><circle cx="9" cy="10" r="2" /><path d="M21 16l-5-5-9 9" /></svg>
 )
+export const Speech = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" {...base}><path d="M21 12a8 8 0 0 1-8 8H8l-5 3 1.5-4.5A8 8 0 1 1 21 12z" /></svg>
+)
 export const Pin = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" {...base}><path d="M12 21s-6-5.3-6-11a6 6 0 0 1 12 0c0 5.7-6 11-6 11z" /><circle cx="12" cy="10" r="2.2" /></svg>
 )

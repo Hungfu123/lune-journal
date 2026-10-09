@@ -14,7 +14,7 @@ from .. import geocode
 from ..images import delete_files, media_path
 from ..limiter import limiter
 from ..live import publish
-from ..models import Entry, Photo, Reaction, User
+from ..models import Comment, Entry, Photo, Reaction, User
 from ..push import notify_others
 from ..security import current_user, signed_media_url
 from .serialize import photo_out
@@ -38,6 +38,9 @@ def entries_out(db: Session, entries: list[Entry], me: User) -> list[dict]:
     hearts = defaultdict(list)
     for r in db.exec(select(Reaction).where(col(Reaction.entry_id).in_(ids))).all():
         hearts[r.entry_id].append(r.user_id)
+    comments: dict[int, int] = defaultdict(int)
+    for row in db.exec(select(Comment.entry_id, func.count()).where(col(Comment.entry_id).in_(ids)).group_by(Comment.entry_id)).all():
+        comments[row[0]] = row[1]
     out = []
     for e in entries:
         ph = photos[e.id]
@@ -55,6 +58,7 @@ def entries_out(db: Session, entries: list[Entry], me: User) -> list[dict]:
             "photos": ph,
             # Selbst eingetragener Ort hat Vorrang vor dem, was im Foto steckt
             "place_name": e.place or next((p["place_name"] for p in ph if p["place_name"]), None),
+            "comments": comments[e.id],
             "hearts": len(hearts[e.id]),
             "hearted": me.id in hearts[e.id],
         })
@@ -168,6 +172,7 @@ def delete_entry(entry_id: int, user: User = Depends(current_user), db: Session 
         delete_files(p.id)
         db.delete(p)
     db.exec(delete(Reaction).where(Reaction.entry_id == e.id))
+    db.exec(delete(Comment).where(Comment.entry_id == e.id))
     db.delete(e)
     db.commit()
     publish("entry", user.id)
