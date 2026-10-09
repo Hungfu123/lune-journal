@@ -87,7 +87,10 @@ export default function MapSheet({ open, onOpenChange, onPick }: {
           className: '',
           html: mehrere
             ? `<span class="map-cluster">${c.points.length}</span>`
-            : `<span class="map-pin${erstes.mine ? ' is-me' : ' is-her'}"><img src="${erstes.thumb}" alt=""></span>`,
+            : erstes.thumb
+              ? `<span class="map-pin${erstes.mine ? ' is-me' : ' is-her'}"><img src="${erstes.thumb}" alt=""></span>`
+              // Eintrag ohne Foto: nur der Standort wurde mitgegeben
+              : `<span class="map-dot${erstes.mine ? ' is-me' : ' is-her'}">${erstes.author.charAt(0)}</span>`,
           iconSize: mehrere ? [38, 38] : [46, 46],
           iconAnchor: mehrere ? [19, 19] : [23, 23],
         })

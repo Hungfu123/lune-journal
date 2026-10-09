@@ -5,6 +5,7 @@ import { useSheetDirection } from '../useMedia'
 import { api } from '../api'
 import { applyTheme } from '../fonts'
 import type { Me, Theme } from '../types'
+import SavedPlaces from './SavedPlaces'
 
 const THEMES: { value: Theme; name: string }[] = [
   { value: 'sunset', name: 'Sonnen\u00ADuntergang' },
@@ -82,6 +83,19 @@ export default function SettingsSheet({ open, onOpenChange, me, onMeChange }: Pr
                 ))}
               </div>
             </div>
+
+            <label className="switch-row">
+              <span>
+                <strong>Standort automatisch mitgeben</strong>
+                <small>
+                  Beim Schreiben holt die App einmal euren Standort und hängt ihn an den Eintrag. So taucht er
+                  auf der Karte auf, auch wenn das Foto keine Koordinaten mitbringt.
+                </small>
+              </span>
+              <input type="checkbox" className="switch" checked={me.auto_location} onChange={(e) => update({ auto_location: e.target.checked })} />
+            </label>
+
+            {me.auto_location && <SavedPlaces />}
 
             <label className="switch-row">
               <span>

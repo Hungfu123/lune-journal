@@ -18,6 +18,7 @@ class User(SQLModel, table=True):
     reminder_weekday: int = 6  # 0 = Montag … 6 = Sonntag
     reminder_hour: int = 19
     ask_place: bool = False  # beim Schreiben immer nach dem Ort fragen
+    auto_location: bool = False  # Standort beim Posten automatisch mitnehmen
     last_reminder_at: Optional[datetime] = None
     created_at: datetime = Field(default_factory=utcnow)
 
@@ -41,6 +42,8 @@ class Entry(SQLModel, table=True):
     mood: str = ""
     energy: Optional[int] = None  # 1–10, freiwillig
     place: str = ""  # selbst eingetragen; Fotos liefern ihren Ort weiterhin selbst
+    lat: Optional[float] = None  # nur wenn der Standort bewusst mitgegeben wurde
+    lon: Optional[float] = None
     created_at: datetime = Field(default_factory=utcnow)
 
 
@@ -65,6 +68,17 @@ class Reaction(SQLModel, table=True):
     entry_id: int = Field(foreign_key="entry.id", index=True)
     user_id: int = Field(foreign_key="user.id")
     kind: str = "heart"
+    created_at: datetime = Field(default_factory=utcnow)
+
+
+class SavedPlace(SQLModel, table=True):
+    """Ort mit Spitznamen („Zuhause", „Arbeit"). Gilt für beide."""
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str
+    lat: float
+    lon: float
+    radius_m: int = 150
+    created_by: int = Field(foreign_key="user.id")
     created_at: datetime = Field(default_factory=utcnow)
 
 

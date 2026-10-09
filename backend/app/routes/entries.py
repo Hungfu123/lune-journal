@@ -3,7 +3,7 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 from sqlalchemy import func
 from sqlmodel import Session, col, delete, select
@@ -12,11 +12,12 @@ from ..config import settings
 from ..db import get_db
 from .. import geocode
 from ..images import delete_files, media_path
-from ..limiter import limiter
 from ..live import publish
 from ..models import Comment, Entry, Photo, Reaction, User
 from ..push import notify_others
 from ..security import current_user, signed_media_url
+from ..db import engine
+from .places import place_name_for
 from .serialize import photo_out
 
 router = APIRouter(prefix="/api", tags=["entries"])
@@ -110,8 +111,24 @@ class EntryIn(BaseModel):
     mood: str = ""
     energy: int | None = Field(None, ge=1, le=10)
     place: str = Field("", max_length=120)
+    lat: float | None = Field(None, ge=-90, le=90)
+    lon: float | None = Field(None, ge=-180, le=180)
     entry_date: date | None = None
     photo_ids: list[str] = Field(default_factory=list, max_length=30)
+
+
+def _fill_entry_place(entry_id: int) -> None:
+    """Namen zum mitgegebenen Standort nachtragen — erst die eigenen Orte, sonst OpenStreetMap.
+    Läuft im Hintergrund, weil die Namensauflösung eine Sekunde dauern kann."""
+    with Session(engine) as db:
+        e = db.get(Entry, entry_id)
+        if not e or e.place or e.lat is None or e.lon is None:
+            return
+        name = place_name_for(db, e.lat, e.lon)
+        if name:
+            e.place = name
+            db.add(e)
+            db.commit()
 
 
 def _notify_new_entry(entry: Entry, author: User, first_photo: str | None) -> None:
@@ -149,7 +166,8 @@ def create_entry(body: EntryIn, bg: BackgroundTasks, user: User = Depends(curren
         raise HTTPException(422, "Einträge in der Zukunft gehen nicht.")
 
     entry = Entry(user_id=user.id, entry_date=entry_date, kind=body.kind,
-                  title=body.title.strip(), text=body.text.strip(), mood=body.mood, energy=body.energy, place=body.place.strip())
+                  title=body.title.strip(), text=body.text.strip(), mood=body.mood, energy=body.energy, place=body.place.strip(),
+                  lat=body.lat, lon=body.lon)
     db.add(entry)
     db.commit()
     db.refresh(entry)
@@ -158,6 +176,8 @@ def create_entry(body: EntryIn, bg: BackgroundTasks, user: User = Depends(curren
         db.add(p)
     db.commit()
 
+    if entry.lat is not None and not entry.place:
+        bg.add_task(_fill_entry_place, entry.id)
     bg.add_task(_notify_new_entry, entry, user, photos[0].id if photos else None)
     publish("entry", user.id)
     return entries_out(db, [entry], user)[0]
@@ -203,37 +223,20 @@ def toggle_heart(entry_id: int, bg: BackgroundTasks, only_add: bool = False,
     return entries_out(db, [e], user)[0]
 
 
-class PlaceLookup(BaseModel):
-    lat: float = Field(..., ge=-90, le=90)
-    lon: float = Field(..., ge=-180, le=180)
-
-
-@router.post("/place")
-@limiter.limit("20/minute")
-def place_lookup(request: Request, body: PlaceLookup, user: User = Depends(current_user), db: Session = Depends(get_db)):
-    """Koordinaten vom Handy in einen lesbaren Ort übersetzen (OpenStreetMap).
-    Die Koordinaten werden nur für diese Anfrage benutzt und nicht gespeichert —
-    am Eintrag landet allein der Name."""
-    # Modulzugriff statt direktem Import: so greift das Patchen in den Tests
-    name = geocode.reverse(db, body.lat, body.lon)
-    if not name:
-        raise HTTPException(503, "Der Ort ließ sich gerade nicht bestimmen. Trag ihn einfach selbst ein.")
-    return {"place_name": name}
-
-
 @router.get("/places")
 def places(user: User = Depends(current_user), db: Session = Depends(get_db)):
-    """Alle Fotos mit Koordinaten für die Karte. Nur Fotos, die an einem Eintrag
-    hängen — lose hochgeladene gehören noch nirgendwo hin."""
-    rows = db.exec(
+    """Punkte für die Karte: Fotos mit Koordinaten und Einträge, bei denen der
+    Standort bewusst mitgegeben wurde. Lose hochgeladene Fotos bleiben außen vor."""
+    users = {u.id: u for u in db.exec(select(User)).all()}
+    punkte: list[dict] = []
+
+    foto_rows = db.exec(
         select(Photo, Entry)
         .join(Entry, col(Photo.entry_id) == Entry.id)
         .where(col(Photo.lat).is_not(None), col(Photo.lon).is_not(None))
-        .order_by(col(Entry.entry_date).desc())
     ).all()
-    users = {u.id: u for u in db.exec(select(User)).all()}
-    return [
-        {
+    for p, e in foto_rows:
+        punkte.append({
             "photo_id": p.id,
             "entry_id": e.id,
             "lat": p.lat,
@@ -243,9 +246,27 @@ def places(user: User = Depends(current_user), db: Session = Depends(get_db)):
             "place_name": p.place_name,
             "author": users[e.user_id].name if e.user_id in users else "",
             "mine": e.user_id == user.id,
-        }
-        for p, e in rows
-    ]
+        })
+
+    mit_foto = {e.id for _, e in foto_rows}
+    eintraege = db.exec(select(Entry).where(col(Entry.lat).is_not(None), col(Entry.lon).is_not(None))).all()
+    for e in eintraege:
+        if e.id in mit_foto:
+            continue  # Foto am selben Eintrag zeigt den Ort schon
+        punkte.append({
+            "photo_id": None,
+            "entry_id": e.id,
+            "lat": e.lat,
+            "lon": e.lon,
+            "thumb": None,
+            "date": e.entry_date.isoformat(),
+            "place_name": e.place or None,
+            "author": users[e.user_id].name if e.user_id in users else "",
+            "mine": e.user_id == user.id,
+        })
+
+    punkte.sort(key=lambda p: p["date"], reverse=True)
+    return punkte
 
 
 @router.get("/memory")

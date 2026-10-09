@@ -15,15 +15,17 @@ interface Props {
   shared?: SharedContent | null
   /** Einstellung „immer nach dem Ort fragen" */
   askPlace?: boolean
+  /** Einstellung „Standort automatisch mitgeben" */
+  autoLocation?: boolean
 }
 
 /** Handy: neuer Eintrag als Sheet von unten. */
-export default function NewEntrySheet({ open, onOpenChange, onPosted, shared, askPlace = false }: Props) {
+export default function NewEntrySheet({ open, onOpenChange, onPosted, shared, askPlace = false, autoLocation = false }: Props) {
   const direction = useSheetDirection()
   const c = useComposer((e) => {
     onOpenChange(false)
     onPosted(e)
-  })
+  }, autoLocation && open)
 
   // Geteilte Fotos genau einmal übernehmen, nicht bei jedem Rendern
   const übernommen = useRef<SharedContent | null>(null)

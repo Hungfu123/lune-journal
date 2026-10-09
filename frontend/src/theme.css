@@ -294,6 +294,15 @@ input, textarea, select { font: inherit; color: inherit; }
 .mood-tag[data-mood='gut'] { --stimmung: var(--stimmung-gut); }
 .mood-tag[data-mood='super'] { --stimmung: var(--me); }
 
+/* ---------- Orte mit Namen ---------- */
+.saved-places { display: grid; gap: 10px; padding: 14px; border-radius: 18px; background: var(--soft); }
+.saved-places-title { margin: 0; font-weight: 700; font-size: 15px; }
+.saved-places-hint { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.4; }
+.saved-place { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 14px;
+  background: var(--surface); border: 1.5px solid var(--line); }
+.saved-place strong { flex: 1; min-width: 0; font-size: 15px; }
+.saved-place svg { color: var(--muted); }
+
 /* ---------- Karte ---------- */
 .map-wrap { position: relative; flex: 1; min-height: 0; margin: 12px 0 calc(12px + env(safe-area-inset-bottom)); }
 .map { position: absolute; inset: 0; border-radius: 20px; overflow: hidden; background: var(--soft); }
@@ -306,6 +315,10 @@ input, textarea, select { font: inherit; color: inherit; }
   border: 3px solid var(--her); background: var(--surface); box-shadow: 0 4px 12px rgb(0 0 0 / 0.25); }
 .map-pin.is-me { border-color: var(--me); }
 .map-pin img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.map-dot { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+  background: var(--her); color: var(--her-on); font-weight: 700; font-size: 14px;
+  border: 3px solid var(--surface); box-shadow: 0 4px 12px rgb(0 0 0 / 0.25); }
+.map-dot.is-me { background: var(--me); color: var(--me-on); }
 .map-cluster { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%;
   background: var(--me); color: var(--me-on); font-weight: 700; font-size: 14px;
   box-shadow: 0 4px 12px rgb(0 0 0 / 0.25); }

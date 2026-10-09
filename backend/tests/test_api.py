@@ -369,3 +369,32 @@ def test_places_only_lists_photos_with_coordinates(as_user, no_network):
     eigene = [p for p in punkte if p["entry_id"] == e["id"]]
     assert [p["photo_id"] for p in eigene] == [mit["id"]]
     assert eigene[0]["lat"] is not None and eigene[0]["mine"] is True
+
+
+# ---------- Orte mit Spitznamen ----------
+
+def test_saved_place_beats_openstreetmap(as_user, no_network):
+    c = as_user("hung")
+    assert c.get("/api/saved-places").json() == []
+
+    liste = c.post("/api/saved-places", json={"name": "Zuhause", "lat": 51.2254, "lon": 6.7763, "radius_m": 150}).json()
+    assert [p["name"] for p in liste] == ["Zuhause"]
+
+    # Direkt am Ort: eigener Name gewinnt gegen den von OpenStreetMap
+    nah = c.post("/api/place", json={"lat": 51.2255, "lon": 6.7764}).json()
+    assert nah["place_name"] == "Zuhause" and nah["eigener_name"] is True
+
+    # Weit weg: wieder OpenStreetMap (im Test gepatcht)
+    weit = c.post("/api/place", json={"lat": 53.55, "lon": 9.99}).json()
+    assert weit["place_name"] == "Rheinufer, Düsseldorf" and weit["eigener_name"] is False
+
+    assert c.post("/api/saved-places", json={"name": "  ", "lat": 1, "lon": 1}).status_code == 422
+    assert c.delete(f"/api/saved-places/{liste[0]['id']}").json() == []
+
+
+def test_entry_with_own_location_appears_on_map(as_user, no_network):
+    c = as_user("hung")
+    e = c.post("/api/entries", json={"kind": "short", "text": "Ohne Foto, aber mit Standort",
+                                     "lat": 48.1372, "lon": 11.5755}).json()
+    punkte = [p for p in c.get("/api/places").json() if p["entry_id"] == e["id"]]
+    assert len(punkte) == 1 and punkte[0]["photo_id"] is None and punkte[0]["lat"] == 48.1372

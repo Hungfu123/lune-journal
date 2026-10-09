@@ -7,6 +7,7 @@ export interface Me {
   theme: Theme
   reminder: { enabled: boolean; weekday: number; hour: number }
   ask_place: boolean
+  auto_location: boolean
   partner: { id: number; name: string } | null
 }
 
@@ -63,12 +64,20 @@ export interface Comment {
   mine: boolean
 }
 
+export interface SavedPlace {
+  id: number
+  name: string
+  lat: number
+  lon: number
+  radius_m: number
+}
+
 export interface MapPoint {
-  photo_id: string
+  photo_id: string | null
   entry_id: number
   lat: number
   lon: number
-  thumb: string
+  thumb: string | null
   date: string
   place_name: string | null
   author: string

@@ -17,7 +17,7 @@ export interface Upload {
 }
 
 /** Gemeinsame Logik für den Handy-Sheet und den Desktop-Schreibtisch. */
-export function useComposer(onPosted: (e: Entry) => void) {
+export function useComposer(onPosted: (e: Entry) => void, autoLocation = false) {
   const [kind, setKind] = useState<'short' | 'long'>('short')
   const [title, setTitle] = useState('')
   const [text, setText] = useState('')
@@ -25,6 +25,7 @@ export function useComposer(onPosted: (e: Entry) => void) {
   const [energy, setEnergy] = useState<number | null>(null)
   const [place, setPlace] = useState('')
   const [locating, setLocating] = useState(false)
+  const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null)
   const [uploads, setUploads] = useState<Upload[]>([])
   const [entryDate, setEntryDate] = useState<string | null>(null)
   const [dismissedDate, setDismissedDate] = useState<string | null>(null)
@@ -46,7 +47,7 @@ export function useComposer(onPosted: (e: Entry) => void) {
 
   const reset = () => {
     uploads.forEach((u) => u.preview.startsWith('blob:') && URL.revokeObjectURL(u.preview))
-    setKind('short'); setTitle(''); setText(''); setMood(''); setEnergy(null); setPlace(''); setUploads([]); setEntryDate(null); setDismissedDate(null)
+    setKind('short'); setTitle(''); setText(''); setMood(''); setEnergy(null); setPlace(''); setCoords(null); setUploads([]); setEntryDate(null); setDismissedDate(null)
   }
 
   const addFiles = async (files: FileList | File[] | null) => {
@@ -84,6 +85,7 @@ export function useComposer(onPosted: (e: Entry) => void) {
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         try {
+          setCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude })
           const r = await api.post<{ place_name: string }>('/api/place', { lat: pos.coords.latitude, lon: pos.coords.longitude })
           setPlace(r.place_name)
         } catch (e) {
@@ -99,6 +101,24 @@ export function useComposer(onPosted: (e: Entry) => void) {
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 },
     )
   }
+
+  // Schalter „Standort automatisch mitgeben": einmal leise fragen. Scheitert das
+  // (keine Erlaubnis, kein Empfang), passiert nichts weiter — kein Fehlertext.
+  useEffect(() => {
+    if (!autoLocation || coords || !navigator.geolocation) return
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude })
+        api
+          .post<{ place_name: string }>('/api/place', { lat: pos.coords.latitude, lon: pos.coords.longitude })
+          .then((r) => setPlace((vorher) => vorher || r.place_name))
+          .catch(() => {})
+      },
+      () => {},
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoLocation])
 
   const connectGoogle = async () => {
     try {
@@ -157,6 +177,8 @@ export function useComposer(onPosted: (e: Entry) => void) {
         mood,
         energy,
         place,
+        lat: coords?.lat ?? null,
+        lon: coords?.lon ?? null,
         entry_date: entryDate,
         photo_ids: ready.map((u) => u.photo!.id),
       })
@@ -173,7 +195,7 @@ export function useComposer(onPosted: (e: Entry) => void) {
   }
 
   return {
-    kind, setKind, title, setTitle, text, setText, mood, setMood, energy, setEnergy, place, setPlace, locating, useStandort, uploads, addFiles, remove, move,
+    kind, setKind, title, setTitle, text, setText, mood, setMood, energy, setEnergy, place, setPlace, locating, useStandort, coords, uploads, addFiles, remove, move,
     entryDate, setEntryDate, suggested, showSuggestion, dismissSuggestion: () => setDismissedDate(suggested),
     posting, canPost, isEmpty, post, gStatus, gConnected, connectGoogle, pickGoogle,
   }

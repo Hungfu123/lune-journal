@@ -26,7 +26,7 @@ const DesktopComposer = forwardRef<ComposerHandle, { me: Me; onPosted: (e: Entry
     setOpen(false)
     area.current?.blur()
     onPosted(e)
-  })
+  }, me.auto_location)
 
   useImperativeHandle(ref, () => ({
     focus: () => {

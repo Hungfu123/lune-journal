@@ -28,6 +28,7 @@ def user_out(user: User, db: Session) -> dict:
         "theme": user.theme if user.theme in THEMES else "sunset",
         "reminder": {"enabled": user.reminder_enabled, "weekday": user.reminder_weekday, "hour": user.reminder_hour},
         "ask_place": user.ask_place,
+        "auto_location": user.auto_location,
         "partner": {"id": partner.id, "name": partner.name} if partner else None,
     }
 
@@ -80,6 +81,7 @@ class MeUpdate(BaseModel):
     reminder_weekday: int | None = Field(None, ge=0, le=6)
     reminder_hour: int | None = Field(None, ge=0, le=23)
     ask_place: bool | None = None
+    auto_location: bool | None = None
 
 
 @router.patch("/me")
@@ -96,6 +98,8 @@ def update_me(body: MeUpdate, user: User = Depends(current_user), db: Session = 
         user.reminder_hour = body.reminder_hour
     if body.ask_place is not None:
         user.ask_place = body.ask_place
+    if body.auto_location is not None:
+        user.auto_location = body.auto_location
     db.add(user)
     db.commit()
     return user_out(user, db)
