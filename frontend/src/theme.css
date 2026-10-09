@@ -15,6 +15,22 @@
   --radius: 26px;
 }
 
+/* Stimmungsfarben: eigene Bedeutung (müde/okay/gut), deshalb nicht aus --me
+   und --her ableitbar. Hell als Standard, für die dunklen Themes weiter unten
+   aufgehellt — sonst fehlt auf dunklem Grund der Kontrast. */
+:root {
+  --stimmung-müde: #6f7d97;
+  --stimmung-okay: #b07d2e;
+  --stimmung-gut: #3f8657;
+}
+
+/* Dunkle Themes: gleiche Bedeutung, heller und weniger gesättigt */
+[data-theme='night'], [data-theme='kino'], [data-theme='tiefsee'] {
+  --stimmung-müde: #9aa8c4;
+  --stimmung-okay: #e0b267;
+  --stimmung-gut: #7dc795;
+}
+
 :root,
 [data-theme='sunset'] {
   --bg: #fff5ee; --surface: #ffffff; --ink: #2a1712; --muted: #6e4e42; --line: #f1dccf; --soft: #fce6da;
@@ -187,7 +203,7 @@ input, textarea, select { font: inherit; color: inherit; }
   background: var(--surface); font-weight: 700; color: var(--ink); user-select: none; -webkit-touch-callout: none; touch-action: none; }
 .hold-fill { position: absolute; inset: 0; display: grid; place-items: center; background: var(--me); color: var(--me-on);
   clip-path: inset(0 100% 0 0); transition: clip-path 200ms var(--ease-out); }
-.hold[data-holding] .hold-fill { clip-path: inset(0 0 0 0); transition: clip-path 2s linear; }
+.hold[data-holding] .hold-fill { clip-path: inset(0 0 0 0); transition: clip-path var(--halten, 900ms) linear; }
 
 /* align-self/align-content: start — sonst dehnt der Schreibtisch (1fr-Spalte)
    die Box auf die volle Resthöhe und der Knopf wird zum Oval. */
@@ -273,9 +289,9 @@ input, textarea, select { font: inherit; color: inherit; }
   color: color-mix(in srgb, var(--stimmung) 70%, var(--ink)); }
 .mood-tag i { width: 9px; height: 9px; border-radius: 50%; background: var(--stimmung); }
 .mood-tag { --stimmung: var(--muted); }
-.mood-tag[data-mood='müde'] { --stimmung: #7c8aa5; }
-.mood-tag[data-mood='okay'] { --stimmung: #c08a3e; }
-.mood-tag[data-mood='gut'] { --stimmung: #4f9a68; }
+.mood-tag[data-mood='müde'] { --stimmung: var(--stimmung-müde); }
+.mood-tag[data-mood='okay'] { --stimmung: var(--stimmung-okay); }
+.mood-tag[data-mood='gut'] { --stimmung: var(--stimmung-gut); }
 .mood-tag[data-mood='super'] { --stimmung: var(--me); }
 
 /* ---------- Toasts (Sonner) ---------- */

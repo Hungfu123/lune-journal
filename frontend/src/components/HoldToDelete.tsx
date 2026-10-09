@@ -1,6 +1,9 @@
 import { useRef, useState } from 'react'
 
-/** Gedrückt halten zum Löschen: 2 s gleichmäßig füllen, beim Loslassen schnell zurück. */
+/** Gedrückt halten zum Löschen: gleichmäßig füllen, beim Loslassen schnell zurück.
+ *  Lang genug, dass es kein Versehen ist, kurz genug, dass es nicht nervt.
+ *  Die Dauer geht als CSS-Variable mit, damit Balken und Auslösen nie auseinanderlaufen. */
+const HALTEN_MS = 900
 export default function HoldToDelete({ onConfirm, label = 'Halten zum Löschen' }: { onConfirm: () => void; label?: string }) {
   const [holding, setHolding] = useState(false)
   const timer = useRef<number>()
@@ -13,7 +16,7 @@ export default function HoldToDelete({ onConfirm, label = 'Halten zum Löschen' 
       setHolding(false)
       navigator.vibrate?.(30)
       onConfirm()
-    }, 2000)
+    }, HALTEN_MS)
   }
   const stop = () => {
     window.clearTimeout(timer.current)
@@ -24,6 +27,7 @@ export default function HoldToDelete({ onConfirm, label = 'Halten zum Löschen' 
     <button
       type="button"
       className="hold"
+      style={{ '--halten': `${HALTEN_MS}ms` } as React.CSSProperties}
       data-holding={holding || undefined}
       data-vaul-no-drag
       onPointerDown={start}
