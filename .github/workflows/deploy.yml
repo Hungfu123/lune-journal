@@ -3,6 +3,12 @@ name: Deploy to Hetzner
 on:
   push:
     branches: [main]
+  workflow_dispatch:        # Deploy von Hand aus der Actions-Oberfläche
+
+# Zwei gleichzeitige Deploys stolpern über die festen Container-Namen
+concurrency:
+  group: deploy
+  cancel-in-progress: false
 
 jobs:
   deploy:
