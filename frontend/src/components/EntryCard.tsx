@@ -22,6 +22,8 @@ function Photos({ photos, onOpen }: { photos: Entry['photos']; onOpen?: (i: numb
   if (photos.length === 0) return null
   if (photos.length === 1) {
     const p = photos[0]
+    // Hochformat wird schmaler statt oben und unten abgeschnitten
+    const hoch = p.height > p.width
     return (
       <button type="button" className="photo-btn" aria-label="Foto groß ansehen" onClick={() => onOpen?.(0)}>
       <img
@@ -33,7 +35,7 @@ function Photos({ photos, onOpen }: { photos: Entry['photos']; onOpen?: (i: numb
         loading="lazy"
         decoding="async"
         onLoad={markLoaded}
-        style={{ aspectRatio: `${p.width} / ${p.height}` }}
+        style={{ aspectRatio: `${p.width} / ${p.height}`, width: hoch ? 'auto' : '100%' }}
       />
       </button>
     )
