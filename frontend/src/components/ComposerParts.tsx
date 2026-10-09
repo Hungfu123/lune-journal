@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { shortDate, todayISO } from '../dates'
 import type { Composer } from '../useComposer'
-import { Camera, Close, Gallery, GPhotos } from './Icons'
+import { Camera, Close, Gallery, GPhotos, Pin } from './Icons'
 import { Spinner } from './Loading'
 
 export const MOODS = ['müde', 'okay', 'gut', 'super']
@@ -61,7 +61,7 @@ export function PlacePicker({ c, immer }: { c: Composer; immer: boolean }) {
       <div className="field">
         <span>Ort</span>
         <button type="button" className="chip-btn place-add" onClick={() => setOffen(true)}>
-          Hinzufügen
+          <Pin /> Hinzufügen
         </button>
       </div>
     )
@@ -106,6 +106,8 @@ export function EnergyPicker({ c }: { c: Composer }) {
           />
         ))}
       </div>
+      {/* Ohne die Enden rät man, wofür die zehn Felder stehen */}
+      <div className="energy-skala" aria-hidden="true"><span>leer</span><span>voll</span></div>
     </div>
   )
 }
@@ -119,7 +121,7 @@ export function PhotoButtons({ c, camera = true }: { c: Composer; camera?: boole
         {camera && <button type="button" className="btn-dashed" onClick={() => cam.current?.click()}><Camera /> Kamera</button>}
         <button type="button" className="btn-dashed" onClick={() => gal.current?.click()}><Gallery /> {camera ? 'Galerie' : 'Fotos hinzufügen'}</button>
         <button type="button" className="btn-dashed" disabled={!!c.gStatus} onClick={c.gConnected ? c.pickGoogle : c.connectGoogle}>
-          <GPhotos /> {c.gConnected ? 'Google Fotos' : 'Google Fotos verbinden'}
+          <GPhotos /> Google Fotos
         </button>
       </div>
       {c.gStatus && <p className="g-status" aria-live="polite">{c.gStatus}</p>}

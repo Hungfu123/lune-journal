@@ -52,7 +52,7 @@ export default function NewEntrySheet({ open, onOpenChange, onPosted, shared, as
             <span className="sheet-bar-platz" aria-hidden="true" />
           </div>
 
-          <div className="sheet-body">
+          <div className="sheet-body sheet-body-eintrag">
             <Segmented
               label="Art des Eintrags"
               value={c.kind}

@@ -398,6 +398,12 @@ input, textarea, select { font: inherit; color: inherit; }
 .lb-meta dt { font-size: 13px; color: var(--muted); }
 .lb-meta dd { margin: 0; font-size: 15px; display: flex; align-items: center; gap: 6px; }
 
+/* Beim Eintrag wächst das Schreibfeld in den freien Platz. Sonst klebt alles
+   oben und über dem Posten-Knopf steht ein Loch, das wie ein vergessener
+   Abschnitt aussieht. */
+.sheet-body-eintrag { display: flex; flex-direction: column; }
+.sheet-body-eintrag > .input-hand, .sheet-body-eintrag > .input-long { flex: 1 1 auto; }
+
 /* ---------- Handy: Formular ohne Scrollen ---------- */
 /* Auf dem Handy zählt jede Zeile. Die Maße sind so gewählt, dass der Eintrag
    auf einen Schirm passt — Trefferflächen bleiben bei 44 px. */
@@ -481,6 +487,7 @@ input, textarea, select { font: inherit; color: inherit; }
 /* Zehn Felder, die sich füllen — angelehnt an eine Energieleiste im Spiel,
    aber ohne Blinken: gefüllt heißt Farbe, leer heißt Umriss. */
 .energy { display: flex; gap: 4px; }
+.energy-skala { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 2px; }
 /* Kein Übergang: Antippen ist direkte Manipulation, da will man die Antwort
    sofort sehen — und Farbübergänge sind ohnehin nicht erlaubt. */
 .energy-cell { position: relative; flex: 1; height: 34px; min-width: 0; border-radius: 7px;
