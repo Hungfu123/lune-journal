@@ -58,6 +58,8 @@ img { display: block; }
 .month-stats { margin-top: 5mm; font-size: 8.5pt; color: var(--muted); }
 .month-stats b { color: var(--ink); }
 .month-mosaic { margin-top: auto; padding-top: 5mm; font-size: 0; break-inside: avoid; }
+/* Auch die Monats-Collage passt die Bilder ein statt sie zu beschneiden */
+.month-mosaic .ph { object-fit: contain; background: var(--soft); }
 .month-quote { margin-top: 6mm; padding: 4mm 5mm; background: var(--soft); border-radius: {{ t.radius }}; }
 .month-quote span { font-size: 7.5pt; font-weight: 700; color: var(--muted); }
 .month-quote p { margin: 1mm 0 0; font-family: 'Hand'; font-size: 17pt; line-height: 1.1; }
