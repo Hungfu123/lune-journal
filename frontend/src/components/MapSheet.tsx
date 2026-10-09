@@ -1,16 +1,19 @@
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Drawer } from 'vaul'
 import { toast } from 'sonner'
 import { api } from '../api'
 import { dayLabel } from '../dates'
 import { useSheetDirection } from '../useMedia'
-import type { MapPoint } from '../types'
+import type { MapPoint, Me } from '../types'
 import { Spinner } from './Loading'
+import Segmented from './Segmented'
 
 /** Punkte, die auf dem Bildschirm dichter als das zusammenliegen, werden zu einem. */
 const CLUSTER_PX = 56
+
+const MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember']
 
 type Cluster = { lat: number; lon: number; points: MapPoint[] }
 
@@ -19,13 +22,19 @@ type Cluster = { lat: number; lon: number; points: MapPoint[] }
  * Bildschirmabstand, nicht nach Entfernung in Metern: zwei Fotos vom selben
  * Platz sollen ein Punkt sein, egal wie weit man herausgezoomt hat.
  */
-export default function MapSheet({ open, onOpenChange, onPick }: {
+type Wer = 'alle' | 'meine' | 'partner'
+
+export default function MapSheet({ open, onOpenChange, onPick, me }: {
   open: boolean
   onOpenChange: (o: boolean) => void
   onPick: (entryId: number, date: string) => void
+  me: Me
 }) {
   const direction = useSheetDirection()
   const [points, setPoints] = useState<MapPoint[] | null>(null)
+  const [wer, setWer] = useState<Wer>('alle')
+  const [jahr, setJahr] = useState('alle')
+  const [monat, setMonat] = useState('alle')
   const box = useRef<HTMLDivElement>(null)
   const map = useRef<L.Map | null>(null)
   const layer = useRef<L.LayerGroup | null>(null)
@@ -37,6 +46,21 @@ export default function MapSheet({ open, onOpenChange, onPick }: {
       toast.error((e as Error).message)
     })
   }, [open])
+
+  const jahre = [...new Set((points ?? []).map((p) => p.date.slice(0, 4)))].sort().reverse()
+  const gezeigt = (points ?? []).filter(
+    (p) =>
+      (wer === 'alle' || (wer === 'meine') === p.mine) &&
+      (jahr === 'alle' || p.date.slice(0, 4) === jahr) &&
+      (monat === 'alle' || p.date.slice(5, 7) === monat),
+  )
+
+  /** Ausschnitt so wählen, dass alle gezeigten Punkte hineinpassen. */
+  const alleZeigen = useCallback(() => {
+    const m = map.current
+    if (!m || !gezeigt.length) return
+    m.fitBounds(L.latLngBounds(gezeigt.map((p) => [p.lat, p.lon] as [number, number])), { padding: [48, 48], maxZoom: 15 })
+  }, [gezeigt])
 
   // Karte aufbauen, sobald das Sheet offen und der Platz bekannt ist
   useEffect(() => {
@@ -53,6 +77,7 @@ export default function MapSheet({ open, onOpenChange, onPick }: {
     if (points.length) {
       m.fitBounds(L.latLngBounds(points.map((p) => [p.lat, p.lon] as [number, number])), { padding: [48, 48], maxZoom: 15 })
     } else {
+      // Kein Punkt da: irgendein Ausschnitt, der Hinweis darüber erklärt es
       m.setView([51.23, 6.78], 11)
     }
     return () => {
@@ -61,6 +86,12 @@ export default function MapSheet({ open, onOpenChange, onPick }: {
       layer.current = null
     }
   }, [open, points])
+
+  // Filter geändert: Ausschnitt nachziehen, damit man die Auswahl auch sieht
+  useEffect(() => {
+    alleZeigen()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wer, jahr, monat])
 
   // Punkte nach jedem Verschieben neu zusammenfassen
   useEffect(() => {
@@ -73,7 +104,7 @@ export default function MapSheet({ open, onOpenChange, onPick }: {
       g.clearLayers()
 
       const clusters: Cluster[] = []
-      for (const p of points) {
+      for (const p of gezeigt) {
         const pos = m.latLngToContainerPoint([p.lat, p.lon])
         const nah = clusters.find((c) => m.latLngToContainerPoint([c.lat, c.lon]).distanceTo(pos) < CLUSTER_PX)
         if (nah) nah.points.push(p)
@@ -111,7 +142,7 @@ export default function MapSheet({ open, onOpenChange, onPick }: {
     return () => {
       m.off('moveend zoomend', zeichnen)
     }
-  }, [points, onPick])
+  }, [gezeigt, onPick])
 
   return (
     <Drawer.Root direction={direction} open={open} onOpenChange={onOpenChange} repositionInputs={false}>
@@ -122,15 +153,53 @@ export default function MapSheet({ open, onOpenChange, onPick }: {
           <div className="sheet-bar">
             <button type="button" className="link-btn" onClick={() => onOpenChange(false)}>Schließen</button>
             <Drawer.Title className="sheet-bar-title">Eure Orte</Drawer.Title>
-            <span className="map-count">{points ? `${points.length} Fotos` : ''}</span>
+            <span className="map-count">{points ? `${gezeigt.length} von ${points.length}` : ''}</span>
           </div>
+
+          {points && points.length > 0 && (
+            <div className="map-filter">
+              <Segmented
+                label="Wessen Orte"
+                value={wer}
+                onChange={setWer}
+                options={[
+                  { value: 'alle', label: 'Alle' },
+                  { value: 'meine', label: 'Meine' },
+                  { value: 'partner', label: me.partner?.name ?? 'Partner' },
+                ]}
+              />
+              <div className="map-filter-row">
+                <select aria-label="Jahr" value={jahr} onChange={(e) => setJahr(e.target.value)}>
+                  <option value="alle">Alle Jahre</option>
+                  {jahre.map((j) => (
+                    <option key={j} value={j}>{j}</option>
+                  ))}
+                </select>
+                <select aria-label="Monat" value={monat} onChange={(e) => setMonat(e.target.value)}>
+                  <option value="alle">Alle Monate</option>
+                  {MONATE.map((name, i) => (
+                    <option key={name} value={String(i + 1).padStart(2, '0')}>{name}</option>
+                  ))}
+                </select>
+                <button type="button" className="btn-secondary btn-small" disabled={!gezeigt.length} onClick={alleZeigen}>
+                  Alle zeigen
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="map-wrap">
             {!points && (
               <p className="map-hint"><Spinner label="Karte lädt" /> Orte werden geladen …</p>
             )}
             {points && points.length === 0 && (
-              <p className="map-hint">Noch keine Fotos mit Ort. Fotos von der Kamera bringen ihn meist mit.</p>
+              <p className="map-hint">
+                Noch kein Foto mit Ort. Kamera-Fotos bringen ihn meist mit; geteilte oft nicht — dafür gibt es in den
+                Einstellungen „Standort automatisch mitgeben".
+              </p>
+            )}
+            {points && points.length > 0 && gezeigt.length === 0 && (
+              <p className="map-hint">Zu dieser Auswahl gibt es keine Orte.</p>
             )}
             <div ref={box} className="map" />
           </div>

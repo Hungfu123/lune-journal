@@ -104,6 +104,13 @@ class GeoCache(SQLModel, table=True):
     place_name: Optional[str] = None
 
 
+class GeoForwardCache(SQLModel, table=True):
+    """Gesuchter Ortsname -> Koordinaten. Spart Anfragen an OpenStreetMap."""
+    key: str = Field(primary_key=True)  # kleingeschriebener Suchbegriff
+    lat: Optional[float] = None
+    lon: Optional[float] = None
+
+
 class Question(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     asker_id: int = Field(foreign_key="user.id", index=True)

@@ -425,3 +425,29 @@ def test_every_theme_is_registered_everywhere():
     # Nicht bis zur ersten ] schneiden — die steckt schon in "Theme[]"
     in_fonts = set(re.findall(r"'([a-zäöü]+)'", re.search(r"const THEMES: Theme\[\] = \[(.*?)\]", liste, re.S).group(1)))
     assert THEMES == in_fonts, f"fonts.ts weicht ab: {THEMES ^ in_fonts}"
+
+
+def test_typed_place_gets_coordinates(as_user, no_network, monkeypatch):
+    """Ein von Hand getippter Ort soll auch auf der Karte landen."""
+    import app.geocode as geocode
+
+    c = as_user("hung")
+    c.post("/api/saved-places", json={"name": "Zuhause", "lat": 51.2254, "lon": 6.7763})
+
+    # Eigener Ort: ohne Nachfrage bei OpenStreetMap
+    monkeypatch.setattr(geocode, "forward", lambda db, q: (_ for _ in ()).throw(AssertionError("hätte nicht fragen dürfen")))
+    e = c.post("/api/entries", json={"kind": "short", "text": "Auf dem Sofa", "place": "zuhause"}).json()
+    punkt = [p for p in c.get("/api/places").json() if p["entry_id"] == e["id"]]
+    assert len(punkt) == 1 and punkt[0]["lat"] == 51.2254
+
+    # Unbekannter Ort: OpenStreetMap wird gefragt
+    monkeypatch.setattr(geocode, "forward", lambda db, q: (48.1372, 11.5755))
+    e2 = c.post("/api/entries", json={"kind": "short", "text": "Kurztrip", "place": "Marienplatz München"}).json()
+    punkt2 = [p for p in c.get("/api/places").json() if p["entry_id"] == e2["id"]]
+    assert len(punkt2) == 1 and punkt2[0]["lat"] == 48.1372
+
+    # Findet sich nichts, bleibt es beim Text — kein Punkt, kein Fehler
+    monkeypatch.setattr(geocode, "forward", lambda db, q: None)
+    e3 = c.post("/api/entries", json={"kind": "short", "text": "Irgendwo", "place": "Hinter den sieben Bergen"}).json()
+    assert e3["place_name"] == "Hinter den sieben Bergen"
+    assert not [p for p in c.get("/api/places").json() if p["entry_id"] == e3["id"]]

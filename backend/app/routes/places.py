@@ -42,6 +42,16 @@ def place_name_for(db: Session, lat: float, lon: float) -> str | None:
     return nickname_for(db, lat, lon) or geocode.reverse(db, lat, lon)
 
 
+def coords_for_name(db: Session, name: str) -> tuple[float, float] | None:
+    """Umgekehrt: getippter Ortsname -> Koordinaten. Ein eigener Ort gewinnt,
+    sonst fragt die App OpenStreetMap."""
+    gesucht = name.strip().lower()
+    for p in db.exec(select(SavedPlace)).all():
+        if p.name.strip().lower() == gesucht:
+            return p.lat, p.lon
+    return geocode.forward(db, name)
+
+
 def place_out(p: SavedPlace) -> dict:
     return {"id": p.id, "name": p.name, "lat": p.lat, "lon": p.lon, "radius_m": p.radius_m}
 

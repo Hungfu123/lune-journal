@@ -25,7 +25,8 @@ export function useComposer(onPosted: (e: Entry) => void, autoLocation = false) 
   const [energy, setEnergy] = useState<number | null>(null)
   const [place, setPlace] = useState('')
   const [locating, setLocating] = useState(false)
-  const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null)
+  // `auto` merkt sich, ob der Standort von allein kam oder bewusst geholt wurde
+  const [coords, setCoords] = useState<{ lat: number; lon: number; auto: boolean } | null>(null)
   const [uploads, setUploads] = useState<Upload[]>([])
   const [entryDate, setEntryDate] = useState<string | null>(null)
   const [dismissedDate, setDismissedDate] = useState<string | null>(null)
@@ -85,7 +86,7 @@ export function useComposer(onPosted: (e: Entry) => void, autoLocation = false) 
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         try {
-          setCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude })
+          setCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude, auto: false })
           const r = await api.post<{ place_name: string }>('/api/place', { lat: pos.coords.latitude, lon: pos.coords.longitude })
           setPlace(r.place_name)
         } catch (e) {
@@ -110,7 +111,7 @@ export function useComposer(onPosted: (e: Entry) => void, autoLocation = false) 
     if (!autoLocation || coords || !uploads.length || !navigator.geolocation) return
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude })
+        setCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude, auto: true })
         api
           .post<{ place_name: string }>('/api/place', { lat: pos.coords.latitude, lon: pos.coords.longitude })
           .then((r) => setPlace((vorher) => vorher || r.place_name))
@@ -170,6 +171,7 @@ export function useComposer(onPosted: (e: Entry) => void, autoLocation = false) 
 
   const post = async () => {
     if (!canPost) return false
+    const mitOrt = !!coords && (!coords.auto || ready.length > 0)
     setPosting(true)
     try {
       const entry = await api.post<Entry>('/api/entries', {
@@ -179,9 +181,10 @@ export function useComposer(onPosted: (e: Entry) => void, autoLocation = false) 
         mood,
         energy,
         place,
-        // Fotos wieder entfernt? Dann auch keine automatischen Koordinaten
-        lat: ready.length ? coords?.lat ?? null : null,
-        lon: ready.length ? coords?.lon ?? null : null,
+        // Selbst geholter Standort geht immer mit. Der automatische nur, wenn am
+        // Ende auch Fotos dranhängen — dafür war er gedacht.
+        lat: mitOrt ? coords!.lat : null,
+        lon: mitOrt ? coords!.lon : null,
         entry_date: entryDate,
         photo_ids: ready.map((u) => u.photo!.id),
       })

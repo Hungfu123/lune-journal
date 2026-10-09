@@ -7,7 +7,7 @@ from sqlmodel import Session
 
 from .config import settings
 from .db import engine
-from .models import GeoCache, Photo
+from .models import GeoCache, GeoForwardCache, Photo
 
 _lock = threading.Lock()
 _last = 0.0
@@ -56,3 +56,38 @@ def fill_place(photo_id: str) -> None:
         photo.place_name = reverse(db, photo.lat, photo.lon)
         db.add(photo)
         db.commit()
+
+
+def forward(db: Session, query: str) -> tuple[float, float] | None:
+    """Ortsname -> Koordinaten. Für selbst getippte Orte, damit sie auf der Karte landen."""
+    global _last
+    key = query.strip().lower()[:120]
+    if not key:
+        return None
+    cached = db.get(GeoForwardCache, key)
+    if cached:
+        return (cached.lat, cached.lon) if cached.lat is not None else None
+
+    treffer: tuple[float, float] | None = None
+    with _lock:
+        wait = 1.1 - (time.monotonic() - _last)
+        if wait > 0:
+            time.sleep(wait)
+        _last = time.monotonic()
+        try:
+            r = httpx.get(
+                "https://nominatim.openstreetmap.org/search",
+                params={"q": query, "format": "jsonv2", "limit": 1, "accept-language": "de"},
+                headers={"User-Agent": f"lune-journal/1.0 ({settings.vapid_subject})"},
+                timeout=10,
+            )
+            r.raise_for_status()
+            daten = r.json()
+            if daten:
+                treffer = (round(float(daten[0]["lat"]), 6), round(float(daten[0]["lon"]), 6))
+        except Exception:
+            return None
+
+    db.add(GeoForwardCache(key=key, lat=treffer[0] if treffer else None, lon=treffer[1] if treffer else None))
+    db.commit()
+    return treffer

@@ -343,6 +343,7 @@ export default function Timeline({ me, onMeChange }: { me: Me; onMeChange: (m: M
         <Suspense fallback={null}>
           <MapSheet
             open
+            me={me}
             onOpenChange={setMapOpen}
             onPick={(entryId, date) => {
               setMapOpen(false)

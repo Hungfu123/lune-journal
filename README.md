@@ -54,9 +54,11 @@ Der Eintrag geht auf, die Fotos hängen schon dran. Dafür muss die App auf dem 
 am Knopf, Antippen klappt sie auf. Tippt ihr ein Foto groß, stehen dort auch die Aufnahmedaten —
 Zeitpunkt, Ort, Größe — und dieselben Kommentare.
 
-**Eure Orte auf einer Karte.** Das Kartensymbol oben zeigt alle Fotos, die Koordinaten mitbringen.
-Was dicht beieinander liegt, wird zu einem Punkt mit Anzahl zusammengefasst; Antippen zoomt hinein,
-ein einzelnes Foto führt zum Eintrag.
+**Eure Orte auf einer Karte.** Das Kartensymbol oben zeigt alles, was einen Ort hat — Fotos mit
+Koordinaten und Einträge, bei denen ihr den Standort mitgegeben oder den Ort selbst eingetippt habt.
+Beim Öffnen passt sich der Ausschnitt so an, dass alle Punkte hineinpassen. Was dicht beieinander liegt,
+wird zu einem Punkt mit Anzahl; Antippen zoomt hinein, ein einzelner Punkt führt zum Eintrag.
+Filtern könnt ihr nach Person, Jahr und Monat, „Alle zeigen" holt den Ausschnitt zurück.
 
 **Stimmung und Energie.** Zur Stimmung (müde / okay / gut / super) kommt ein Energielevel von 1 bis 10,
 beides freiwillig und beides direkt auf der Karte ablesbar.

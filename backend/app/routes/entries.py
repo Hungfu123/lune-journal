@@ -17,7 +17,7 @@ from ..models import Comment, Entry, Photo, Reaction, User
 from ..push import notify_others
 from ..security import current_user, signed_media_url
 from ..db import engine
-from .places import place_name_for
+from .places import coords_for_name, place_name_for
 from .serialize import photo_out
 
 router = APIRouter(prefix="/api", tags=["entries"])
@@ -117,6 +117,20 @@ class EntryIn(BaseModel):
     photo_ids: list[str] = Field(default_factory=list, max_length=30)
 
 
+def _fill_entry_coords(entry_id: int) -> None:
+    """Selbst getippter Ort ohne Koordinaten: nachschlagen, damit der Eintrag
+    auch auf der Karte auftaucht. Findet sich nichts, bleibt es beim Text."""
+    with Session(engine) as db:
+        e = db.get(Entry, entry_id)
+        if not e or not e.place or e.lat is not None:
+            return
+        gefunden = coords_for_name(db, e.place)
+        if gefunden:
+            e.lat, e.lon = gefunden
+            db.add(e)
+            db.commit()
+
+
 def _fill_entry_place(entry_id: int) -> None:
     """Namen zum mitgegebenen Standort nachtragen — erst die eigenen Orte, sonst OpenStreetMap.
     Läuft im Hintergrund, weil die Namensauflösung eine Sekunde dauern kann."""
@@ -178,6 +192,8 @@ def create_entry(body: EntryIn, bg: BackgroundTasks, user: User = Depends(curren
 
     if entry.lat is not None and not entry.place:
         bg.add_task(_fill_entry_place, entry.id)
+    elif entry.place and entry.lat is None:
+        bg.add_task(_fill_entry_coords, entry.id)
     bg.add_task(_notify_new_entry, entry, user, photos[0].id if photos else None)
     publish("entry", user.id)
     return entries_out(db, [entry], user)[0]
