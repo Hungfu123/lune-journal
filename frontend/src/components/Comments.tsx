@@ -16,10 +16,12 @@ export default function Comments({ entryId, onCount }: { entryId: number; onCoun
   const [busy, setBusy] = useState(false)
   const feld = useRef<HTMLTextAreaElement>(null)
 
-  // Mitwachsen statt Anfasser am Rand — auf dem Handy zieht daran niemand
+  // Mitwachsen: moderne Browser können das selbst (field-sizing). Nur wo das
+  // fehlt, per Hand nachmessen — das Zurücksetzen auf 'auto' lässt die Seite
+  // sonst bei jedem Zeichen kurz springen.
   useEffect(() => {
     const el = feld.current
-    if (!el) return
+    if (!el || CSS.supports?.('field-sizing', 'content')) return
     el.style.height = 'auto'
     el.style.height = `${el.scrollHeight}px`
   }, [text])
@@ -46,7 +48,8 @@ export default function Comments({ entryId, onCount }: { entryId: number; onCoun
     try {
       übernehmen(await api.post<Comment[]>(`/api/entries/${entryId}/comments`, { text }))
       setText('')
-      feld.current?.focus()
+      // ohne preventScroll springt die Seite zum Feld, sobald die Liste wächst
+      feld.current?.focus({ preventScroll: true })
     } catch (e) {
       toast.error((e as Error).message)
     } finally {
