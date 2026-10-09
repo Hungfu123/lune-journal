@@ -1,4 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { MAX } from '../limits'
 import { createPortal } from 'react-dom'
 import type { SharedContent } from '../share'
 import { useComposer } from '../useComposer'
@@ -104,7 +105,7 @@ const DesktopComposer = forwardRef<ComposerHandle, { me: Me; onPosted: (e: Entry
       <div className="desk-head">
         <span className="avatar is-me-bg" aria-hidden="true">{me.name.charAt(0)}</span>
         {c.kind === 'long' && (open || !c.isEmpty) ? (
-          <input className="desk-title" value={c.title} onChange={(e) => c.setTitle(e.target.value)} placeholder="Titel für deinen Tag" />
+          <input className="desk-title" maxLength={MAX.titel} value={c.title} onChange={(e) => c.setTitle(e.target.value)} placeholder="Titel für deinen Tag" />
         ) : (
           <span className="desk-greeting">{open || !c.isEmpty ? 'Neuer Eintrag' : `Was war heute, ${me.name}?`}</span>
         )}
@@ -118,6 +119,7 @@ const DesktopComposer = forwardRef<ComposerHandle, { me: Me; onPosted: (e: Entry
       <textarea
         ref={area}
         className="desk-text"
+        maxLength={MAX.text}
         rows={1}
         value={c.text}
         onFocus={() => setOpen(true)}

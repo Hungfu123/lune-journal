@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { MAX } from '../limits'
 import { toast } from 'sonner'
 import { api } from '../api'
 import type { Me, Question } from '../types'
@@ -35,7 +36,7 @@ function OpenForMe({ q, me, onAnswered }: { q: Question; me: Me; onAnswered: (q:
       <h2 className="ask-text">{q.text}</h2>
       <label className="field">
         <span className="visually-hidden">Deine Antwort</span>
-        <textarea className="input-answer" value={text} onChange={(e) => setText(e.target.value)} placeholder="Ein Satz reicht …" />
+        <textarea className="input-answer" maxLength={MAX.antwort} value={text} onChange={(e) => setText(e.target.value)} placeholder="Ein Satz reicht …" />
       </label>
       {q.both && (
         <p className="ask-hint">

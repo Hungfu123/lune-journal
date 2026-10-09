@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { MAX } from '../limits'
 import { Drawer } from 'vaul'
 import type { SharedContent } from '../share'
 import { useComposer } from '../useComposer'
@@ -62,12 +63,13 @@ export default function NewEntrySheet({ open, onOpenChange, onPosted, shared, as
             {c.kind === 'long' && (
               <label className="field">
                 <span>Titel</span>
-                <input className="input-title" value={c.title} onChange={(e) => c.setTitle(e.target.value)} placeholder="Sonntag am Rhein" />
+                <input className="input-title" maxLength={MAX.titel} value={c.title} onChange={(e) => c.setTitle(e.target.value)} placeholder="Sonntag am Rhein" />
               </label>
             )}
             <label className="field">
               <span>{c.kind === 'long' ? 'Erzähl von deinem Tag' : 'Ein Satz zu heute'}</span>
               <textarea
+                maxLength={MAX.text}
                 className={c.kind === 'long' ? 'input-long' : 'input-hand'}
                 value={c.text}
                 onChange={(e) => c.setText(e.target.value)}

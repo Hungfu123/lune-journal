@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { MAX } from '../limits'
 import { createPortal } from 'react-dom'
 import type { Composer } from '../useComposer'
 
@@ -43,7 +44,7 @@ export default function FocusWriter({ c, onClose }: { c: Composer; onClose: () =
       </div>
       <div className="focus-page">
         <input className="focus-title" value={c.title} onChange={(e) => c.setTitle(e.target.value)} placeholder="Titel" aria-label="Titel" />
-        <textarea ref={text} className="focus-text" value={c.text} onChange={(e) => c.setText(e.target.value)} placeholder="Was ist heute passiert?" aria-label="Text" />
+        <textarea ref={text} className="focus-text" maxLength={MAX.text} value={c.text} onChange={(e) => c.setText(e.target.value)} placeholder="Was ist heute passiert?" aria-label="Text" />
       </div>
     </div>,
     document.body,

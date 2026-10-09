@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { MAX } from '../limits'
 import { toast } from 'sonner'
 import { Drawer } from 'vaul'
 import { useSheetDirection } from '../useMedia'
@@ -52,7 +53,7 @@ export default function AskSheet({ open, onOpenChange, partnerName, onAsked }: P
           <div className="sheet-body sheet-body-plain">
             <label className="field">
               <span>Deine Frage</span>
-              <textarea className="input-question" value={text} onChange={(e) => setText(e.target.value)} placeholder="Was wolltest du schon immer wissen?" />
+              <textarea className="input-question" maxLength={MAX.frage} value={text} onChange={(e) => setText(e.target.value)} placeholder="Was wolltest du schon immer wissen?" />
             </label>
 
             <div className="ideas">
