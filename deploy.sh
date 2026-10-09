@@ -9,7 +9,11 @@
 set -e
 
 cd /opt/lune-journal/repo
-git pull origin main
+# Hart auf den Remote-Stand ziehen statt zu mergen: der Klon ist eine reine
+# Kopie, lokale Abweichungen sollen hier nie entstehen (und ein umgeschriebener
+# Verlauf darf den Deploy nicht blockieren).
+git fetch --prune origin
+git reset --hard origin/main
 
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 
