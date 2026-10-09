@@ -62,3 +62,15 @@ export interface Comment {
   author: { id: number; name: string }
   mine: boolean
 }
+
+export interface MapPoint {
+  photo_id: string
+  entry_id: number
+  lat: number
+  lon: number
+  thumb: string
+  date: string
+  place_name: string | null
+  author: string
+  mine: boolean
+}

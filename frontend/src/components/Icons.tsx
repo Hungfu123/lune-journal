@@ -20,6 +20,9 @@ export const Gallery = () => (
 export const Speech = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" {...base}><path d="M21 12a8 8 0 0 1-8 8H8l-5 3 1.5-4.5A8 8 0 1 1 21 12z" /></svg>
 )
+export const MapIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" {...base}><path d="M9 3 3 5.5v15L9 18m0-15 6 3m-6-3v15m6-12 6-2.5v15L15 21m0-15v15m-6-3 6 3" /></svg>
+)
 export const Pin = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" {...base}><path d="M12 21s-6-5.3-6-11a6 6 0 0 1 12 0c0 5.7-6 11-6 11z" /><circle cx="12" cy="10" r="2.2" /></svg>
 )

@@ -46,6 +46,17 @@ Fragen und Jahresrückblick. Vorher durchblättern, dann teilen oder drucken.
 (auch in einem gemeinsamen Album), WhatsApp oder der Galerie die Bilder markieren, *Teilen* → *Lune Journal*.
 Der Eintrag geht auf, die Fotos hängen schon dran. Dafür muss die App auf dem Handy installiert sein.
 
+**Miteinander reden.** Unter jedem Eintrag könnt ihr kommentieren, auch unter eigenen. Die Anzahl steht
+am Knopf, Antippen klappt sie auf. Tippt ihr ein Foto groß, stehen dort auch die Aufnahmedaten —
+Zeitpunkt, Ort, Größe — und dieselben Kommentare.
+
+**Eure Orte auf einer Karte.** Das Kartensymbol oben zeigt alle Fotos, die Koordinaten mitbringen.
+Was dicht beieinander liegt, wird zu einem Punkt mit Anzahl zusammengefasst; Antippen zoomt hinein,
+ein einzelnes Foto führt zum Eintrag.
+
+**Stimmung und Energie.** Zur Stimmung (müde / okay / gut / super) kommt ein Energielevel von 1 bis 10,
+beides freiwillig und beides direkt auf der Karte ablesbar.
+
 **Es euch schön machen.** Elf Designs, jedes mit eigener Überschrift-Schrift. Jeder stellt sein eigenes
 ein — ihr müsst euch nicht einigen.
 
@@ -73,6 +84,8 @@ einfügen, per Ziehen sortieren, <kbd>Strg</kbd>+<kbd>Enter</kbd> postet. <kbd>N
   für den Druck auf dem Server.
 - Bilder in Push-Benachrichtigungen laufen über signierte Links, die nach kurzer Zeit ablaufen.
 - Die Seite sagt Suchmaschinen per `X-Robots-Tag`, dass sie nichts zu suchen haben.
+- Eine Ausnahme: die Kartenansicht lädt Kacheln von OpenStreetMap. Deren Server sieht dabei, welchen
+  Ausschnitt ihr anschaut — nicht eure Fotos, aber die Gegend. Wer das nicht möchte, lässt die Karte zu.
 - Backups auf die Hetzner Storage Box sind mit restic verschlüsselt.
 
 ## Wie es gebaut ist
@@ -82,6 +95,7 @@ einfügen, per Ziehen sortieren, <kbd>Strg</kbd>+<kbd>Enter</kbd> postet. <kbd>N
 | Frontend | React 18, Vite, TypeScript, Vaul (Sheets), Sonner (Toasts), vite-plugin-pwa |
 | Backend | FastAPI, SQLModel auf SQLite (WAL), Pillow, WeasyPrint (Buch-PDF), pywebpush |
 | Live-Updates | Server-Sent Events auf `/api/stream`, Browser lädt bei Änderung nach |
+| Karte | Leaflet mit OpenStreetMap-Kacheln, wird erst beim Öffnen nachgeladen |
 | Auslieferung | Caddy: App, `/api` → FastAPI, `/media` mit `forward_auth` |
 | Server | Hetzner VPS, Docker Compose, hinter dem Nginx der Softball-App (TLS) |
 

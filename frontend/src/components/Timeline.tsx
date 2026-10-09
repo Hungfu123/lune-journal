@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { toast } from 'sonner'
 import { api } from '../api'
@@ -18,11 +18,14 @@ import DesktopComposer, { type ComposerHandle } from './DesktopComposer'
 import Lightbox from './Lightbox'
 import { FeedSkeleton } from './Loading'
 import RightRail from './RightRail'
-import { Book, Chevron, Plus } from './Icons'
+import { Book, Chevron, MapIcon, Plus } from './Icons'
 import MonthGrid from './MonthGrid'
 import MonthSheet from './MonthSheet'
 import NewEntrySheet from './NewEntrySheet'
 import Segmented from './Segmented'
+
+// Leaflet wiegt mehr als die halbe App — erst laden, wenn die Karte aufgeht
+const MapSheet = lazy(() => import('./MapSheet'))
 
 type Filter = 'all' | 'me' | 'partner'
 
@@ -45,6 +48,7 @@ export default function Timeline({ me, onMeChange }: { me: Me; onMeChange: (m: M
   const [askOpen, setAskOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [bookOpen, setBookOpen] = useState(false)
+  const [mapOpen, setMapOpen] = useState(false)
   const shownMonth = useRef(month)
   const viaKeyboard = useRef(false)
   const desktop = useIsDesktop()
@@ -231,6 +235,9 @@ export default function Timeline({ me, onMeChange }: { me: Me; onMeChange: (m: M
           <h1 className="brand">Lune Journal</h1>
         </div>
         <div className="header-actions">
+          <button type="button" className="icon-btn" aria-label="Karte mit euren Orten" onClick={() => setMapOpen(true)}>
+            <MapIcon />
+          </button>
           <button type="button" className="icon-btn" aria-label="Buch erstellen" onClick={() => setBookOpen(true)}>
             <Book />
           </button>
@@ -332,6 +339,19 @@ export default function Timeline({ me, onMeChange }: { me: Me; onMeChange: (m: M
         <Plus />
       </button>
 
+      {mapOpen && (
+        <Suspense fallback={null}>
+          <MapSheet
+            open
+            onOpenChange={setMapOpen}
+            onPick={(entryId, date) => {
+              setMapOpen(false)
+              setMonth(date.slice(0, 7))
+              setHighlightId(entryId)
+            }}
+          />
+        </Suspense>
+      )}
       {!desktop && <NewEntrySheet open={newOpen} onOpenChange={setNewOpen} onPosted={posted} shared={shared} askPlace={me.ask_place} />}
       {lightbox && (
         <Lightbox photos={lightbox.photos} start={lightbox.index} caption={lightbox.caption} entry={lightbox.entry} onClose={() => setLightbox(null)} />

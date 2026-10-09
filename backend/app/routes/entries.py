@@ -221,6 +221,33 @@ def place_lookup(request: Request, body: PlaceLookup, user: User = Depends(curre
     return {"place_name": name}
 
 
+@router.get("/places")
+def places(user: User = Depends(current_user), db: Session = Depends(get_db)):
+    """Alle Fotos mit Koordinaten für die Karte. Nur Fotos, die an einem Eintrag
+    hängen — lose hochgeladene gehören noch nirgendwo hin."""
+    rows = db.exec(
+        select(Photo, Entry)
+        .join(Entry, col(Photo.entry_id) == Entry.id)
+        .where(col(Photo.lat).is_not(None), col(Photo.lon).is_not(None))
+        .order_by(col(Entry.entry_date).desc())
+    ).all()
+    users = {u.id: u for u in db.exec(select(User)).all()}
+    return [
+        {
+            "photo_id": p.id,
+            "entry_id": e.id,
+            "lat": p.lat,
+            "lon": p.lon,
+            "thumb": media_path(p.id, "thumb"),
+            "date": e.entry_date.isoformat(),
+            "place_name": p.place_name,
+            "author": users[e.user_id].name if e.user_id in users else "",
+            "mine": e.user_id == user.id,
+        }
+        for p, e in rows
+    ]
+
+
 @router.get("/memory")
 def memory(user: User = Depends(current_user), db: Session = Depends(get_db)):
     """Eine Erinnerung für die Seitenleiste: bevorzugt „heute vor einem Jahr“, sonst ein zufälliger älterer Tag mit Fotos."""

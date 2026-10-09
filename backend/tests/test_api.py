@@ -355,3 +355,17 @@ def test_deleting_entry_removes_comments(as_user, no_network):
     c.post(f"/api/entries/{e['id']}/comments", json={"text": "bleibt nicht"})
     assert c.delete(f"/api/entries/{e['id']}").status_code == 200
     assert c.get(f"/api/entries/{e['id']}/comments").status_code == 404
+
+
+# ---------- Karte ----------
+
+def test_places_only_lists_photos_with_coordinates(as_user, no_network):
+    c = as_user("hung")
+    mit = c.post("/api/photos", files={"file": ("a.jpg", jpeg(taken="2026:05:01 10:00:00"), "image/jpeg")}).json()
+    ohne = c.post("/api/photos", files={"file": ("b.jpg", jpeg(taken=None, gps=False), "image/jpeg")}).json()
+    e = c.post("/api/entries", json={"kind": "short", "text": "Karte", "photo_ids": [mit["id"], ohne["id"]]}).json()
+
+    punkte = c.get("/api/places").json()
+    eigene = [p for p in punkte if p["entry_id"] == e["id"]]
+    assert [p["photo_id"] for p in eigene] == [mit["id"]]
+    assert eigene[0]["lat"] is not None and eigene[0]["mine"] is True

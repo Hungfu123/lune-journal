@@ -60,6 +60,10 @@ genau wie bei den beiden anderen Domains auf dem Server.
   `src/share.ts` holt sie dort genau einmal ab. Der Service Worker ruft `skipWaiting()` und
   `clientsClaim()`, sonst wäre er beim ersten Start nicht zuständig und der POST ginge an den Server.
 
+- **Karte:** `MapSheet.tsx` wird per `lazy()` nachgeladen — Leaflet wiegt mehr als die halbe App.
+  Zusammengefasst wird nach Bildschirmabstand (`CLUSTER_PX`), nicht nach Entfernung in Metern.
+  Kacheln kommen von OpenStreetMap; der Kachelserver sieht den Ausschnitt.
+
 ## Noch nicht mit echten Konten getestet
 - Google-Login (braucht echte `GOOGLE_CLIENT_ID`)
 - Google Fotos Picker (Photos Picker API in der Cloud Console aktivieren)
