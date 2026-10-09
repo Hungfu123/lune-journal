@@ -22,6 +22,9 @@ BOOK_THEMES = {
     "retro":    dict(name="Retro", display="retro", paper="#FFF8EC", ink="#3A2213", muted="#76563F", line="#E6CFAF", soft="#F4E2C6", me="#B83F0C", her="#246A64", radius="3.5mm"),
     "kino":     dict(name="Kino", display="kino", paper="#FFFBF6", ink="#2A1418", muted="#6E5550", line="#EADBD2", soft="#F6ECE4", me="#8A5A00", her="#B23A55", radius="3mm"),
     "bonbon":   dict(name="Bonbon", display="bonbon", paper="#FFF8FB", ink="#2B1030", muted="#6D4870", line="#FFD3E6", soft="#FFE6F0", me="#C81E63", her="#16707F", radius="7mm"),
+    "puder":    dict(name="Puder", display="lavendel", paper="#FFFBFC", ink="#2C1F26", muted="#6B5460", line="#F0DDE6", soft="#F8EBF1", me="#A83F67", her="#45688A", radius="6mm"),
+    "himmel":   dict(name="Himmel", display="polaroid", paper="#FBFCFF", ink="#17202E", muted="#52637C", line="#DAE3F1", soft="#EAF0FA", me="#3A5CA6", her="#A8552F", radius="4mm"),
+    "mandel":   dict(name="Mandel", display="bonbon", paper="#FFFCF6", ink="#2A2018", muted="#6A5847", line="#EADBC8", soft="#F5EADC", me="#9B5340", her="#4F6E58", radius="5mm"),
     "polaroid": dict(name="Polaroid", display="polaroid", paper="#FFFFFF", ink="#1A1A1A", muted="#666661", line="#E2E2DE", soft="#F1F1EE", me="#D1401F", her="#2563C9", radius="1mm"),
 }
 

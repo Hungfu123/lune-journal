@@ -1,6 +1,6 @@
 import type { Theme } from './types'
 
-const THEMES: Theme[] = ['sunset', 'ocean', 'night', 'zitrone', 'tiefsee', 'wald', 'lavendel', 'retro', 'kino', 'bonbon', 'polaroid']
+const THEMES: Theme[] = ['sunset', 'ocean', 'night', 'zitrone', 'tiefsee', 'wald', 'lavendel', 'retro', 'kino', 'bonbon', 'polaroid', 'puder', 'himmel', 'mandel']
 
 export const THEME_KEYS = THEMES
 

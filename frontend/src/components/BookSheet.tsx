@@ -11,6 +11,7 @@ import Segmented from './Segmented'
 const THEME_NAMES: Record<Theme, string> = {
   sunset: 'Sonnenuntergang', ocean: 'Ozean', night: 'Nacht', zitrone: 'Zitrone', tiefsee: 'Tiefsee', wald: 'Wald',
   lavendel: 'Lavendel', retro: 'Retro', kino: 'Kino', bonbon: 'Bonbon', polaroid: 'Polaroid',
+  puder: 'Puder', himmel: 'Himmel', mandel: 'Mandel',
 }
 
 type Range = 'year' | 'last12' | 'month' | 'custom'

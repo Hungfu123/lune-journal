@@ -1,4 +1,4 @@
-export type Theme = 'sunset' | 'ocean' | 'night' | 'wald' | 'lavendel' | 'zitrone' | 'polaroid' | 'kino' | 'retro' | 'bonbon' | 'tiefsee'
+export type Theme = 'sunset' | 'ocean' | 'night' | 'wald' | 'lavendel' | 'zitrone' | 'polaroid' | 'kino' | 'retro' | 'bonbon' | 'tiefsee' | 'puder' | 'himmel' | 'mandel'
 
 export interface Me {
   id: number

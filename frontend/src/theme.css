@@ -37,6 +37,33 @@
   --me: #c8432c; --me-on: #ffffff; --her: #7a3e9d; --her-on: #ffffff;
   color-scheme: light;
 }
+
+/* ---------- Pastell ---------- */
+/* Gedeckte Flächen, aber kräftige Akzente: die Akzentfarbe trägt auch Text,
+   deshalb ist sie dunkler als die Fläche. Alle Paare über 4,5:1 geprüft. */
+[data-theme='puder'] {
+  --bg: #FBF3F6; --surface: #FFFFFF; --ink: #2C1F26; --muted: #6B5460; --line: #F0DDE6; --soft: #F8E7EF;
+  --me: #A83F67; --me-on: #FFFFFF; --her: #45688A; --her-on: #FFFFFF;
+  --radius: 30px;
+  --font-display: 'Fraunces', Georgia, serif; --display-weight: 600; --display-variation: 'SOFT' 50, 'WONK' 1; --display-tracking: -0.005em;
+  --reveal-scale: 0.98;
+  color-scheme: light;
+}
+[data-theme='himmel'] {
+  --bg: #F0F4FB; --surface: #FFFFFF; --ink: #17202E; --muted: #52637C; --line: #DAE3F1; --soft: #E7EDF8;
+  --me: #3A5CA6; --me-on: #FFFFFF; --her: #A8552F; --her-on: #FFFFFF;
+  --radius: 24px;
+  --font-display: 'Manrope', system-ui, sans-serif; --display-weight: 800; --display-tracking: -0.03em;
+  color-scheme: light;
+}
+[data-theme='mandel'] {
+  --bg: #FAF4EC; --surface: #FFFDF9; --ink: #2A2018; --muted: #6A5847; --line: #EADBC8; --soft: #F3E6D5;
+  --me: #9B5340; --me-on: #FFFFFF; --her: #4F6E58; --her-on: #FFFFFF;
+  --radius: 28px;
+  --font-display: 'Fredoka', 'Manrope', system-ui, sans-serif; --display-weight: 500; --display-tracking: 0;
+  color-scheme: light;
+}
+
 [data-theme='ocean'] {
   --bg: #eff6f7; --surface: #ffffff; --ink: #0e252c; --muted: #47636b; --line: #d3e5e8; --soft: #dceef0;
   --me: #0b6f78; --me-on: #ffffff; --her: #b4501a; --her-on: #ffffff;
@@ -121,7 +148,9 @@ input, textarea, select { font: inherit; color: inherit; }
 /* ---------- Layout ---------- */
 .app { max-width: 560px; margin: 0 auto; min-height: 100dvh; padding-bottom: calc(120px + env(safe-area-inset-bottom)); }
 .top { display: flex; align-items: center; justify-content: space-between; padding: calc(20px + env(safe-area-inset-top)) 20px 4px; }
-.brand { margin: 0; font-family: var(--font-display); font-size: 30px; line-height: 1.05; letter-spacing: -0.02em; }
+/* Mit dem Kartenknopf wurde die Kopfzeile enger: bei den breiteren Schriften
+   (Fraunces in Wald, Retro, Puder) brach der Titel sonst auf zwei Zeilen. */
+.brand { margin: 0; font-family: var(--font-display); font-size: clamp(22px, 6.6vw, 30px); line-height: 1.05; letter-spacing: -0.02em; }
 .avatars { display: flex; }
 .avatar { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 14px; flex-shrink: 0;
   background: var(--c); color: var(--c-on); }

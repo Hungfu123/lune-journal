@@ -19,6 +19,9 @@ const THEMES: { value: Theme; name: string }[] = [
   { value: 'retro', name: 'Retro' },
   { value: 'bonbon', name: 'Bonbon' },
   { value: 'tiefsee', name: 'Tiefsee' },
+  { value: 'puder', name: 'Puder' },
+  { value: 'himmel', name: 'Himmel' },
+  { value: 'mandel', name: 'Mandel' },
 ]
 const DAYS = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag']
 

@@ -12,7 +12,7 @@ from ..security import COOKIE, current_session, current_user, media_signature_ok
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
-THEMES = {"sunset", "ocean", "night", "wald", "lavendel", "zitrone", "polaroid", "kino", "retro", "bonbon", "tiefsee"}
+THEMES = {"sunset", "ocean", "night", "wald", "lavendel", "zitrone", "polaroid", "kino", "retro", "bonbon", "tiefsee", "puder", "himmel", "mandel"}
 
 
 class GoogleLogin(BaseModel):

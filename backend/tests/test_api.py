@@ -398,3 +398,30 @@ def test_entry_with_own_location_appears_on_map(as_user, no_network):
                                      "lat": 48.1372, "lon": 11.5755}).json()
     punkte = [p for p in c.get("/api/places").json() if p["entry_id"] == e["id"]]
     assert len(punkte) == 1 and punkte[0]["photo_id"] is None and punkte[0]["lat"] == 48.1372
+
+
+# ---------- Themes ----------
+
+def test_every_theme_is_registered_everywhere():
+    """Ein Theme muss an mehreren Stellen eingetragen sein. Vergisst man eine,
+    fällt es sonst erst auf, wenn jemand es auswählt."""
+    import re
+    from pathlib import Path
+
+    from app.book.themes import BOOK_THEMES
+    from app.routes.auth import THEMES
+
+    assert THEMES == set(BOOK_THEMES), "Buch-Palette fehlt oder ist zu viel"
+
+    frontend = Path(__file__).resolve().parents[2] / "frontend" / "src"
+    css = (frontend / "theme.css").read_text(encoding="utf-8")
+    im_css = set(re.findall(r"\[data-theme='([^']+)'\]", css))
+    assert THEMES <= im_css, f"ohne Farben in theme.css: {THEMES - im_css}"
+
+    typen = set(re.findall(r"'([a-zäöü]+)'", (frontend / "types.ts").read_text(encoding="utf-8").splitlines()[0]))
+    assert THEMES == typen, f"types.ts weicht ab: {THEMES ^ typen}"
+
+    liste = (frontend / "fonts.ts").read_text(encoding="utf-8")
+    # Nicht bis zur ersten ] schneiden — die steckt schon in "Theme[]"
+    in_fonts = set(re.findall(r"'([a-zäöü]+)'", re.search(r"const THEMES: Theme\[\] = \[(.*?)\]", liste, re.S).group(1)))
+    assert THEMES == in_fonts, f"fonts.ts weicht ab: {THEMES ^ in_fonts}"
