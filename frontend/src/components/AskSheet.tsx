@@ -43,11 +43,11 @@ export default function AskSheet({ open, onOpenChange, partnerName, onAsked }: P
   }
 
   return (
-    <Drawer.Root direction={direction} open={open} onOpenChange={onOpenChange} repositionInputs={false}>
+    <Drawer.Root handleOnly closeThreshold={0.4} direction={direction} open={open} onOpenChange={onOpenChange} repositionInputs={false}>
       <Drawer.Portal>
         <Drawer.Overlay className="sheet-overlay" />
         <Drawer.Content className="sheet" aria-describedby={undefined}>
-          <div className="sheet-handle" />
+          <Drawer.Handle className="sheet-handle" preventCycle />
           <Drawer.Title className="sheet-title">Frage an {partnerName}</Drawer.Title>
           <div className="sheet-body sheet-body-plain">
             <label className="field">

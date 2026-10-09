@@ -39,11 +39,11 @@ export default function NewEntrySheet({ open, onOpenChange, onPosted, shared, as
   }, [open, shared])
 
   return (
-    <Drawer.Root direction={direction} open={open} onOpenChange={onOpenChange} repositionInputs={false}>
+    <Drawer.Root handleOnly closeThreshold={0.4} direction={direction} open={open} onOpenChange={onOpenChange} repositionInputs={false}>
       <Drawer.Portal>
         <Drawer.Overlay className="sheet-overlay" />
         <Drawer.Content className="sheet sheet-tall" aria-describedby={undefined}>
-          <div className="sheet-handle" />
+          <Drawer.Handle className="sheet-handle" preventCycle />
           <div className="sheet-bar">
             <button type="button" className="link-btn" onClick={() => onOpenChange(false)}>Abbrechen</button>
             <Drawer.Title className="sheet-bar-title">Neuer Eintrag</Drawer.Title>

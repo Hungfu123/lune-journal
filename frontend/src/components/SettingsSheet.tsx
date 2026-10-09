@@ -68,12 +68,16 @@ export default function SettingsSheet({ open, onOpenChange, me, onMeChange }: Pr
   }
 
   return (
-    <Drawer.Root direction={direction} open={open} onOpenChange={onOpenChange}>
+    <Drawer.Root handleOnly closeThreshold={0.4} direction={direction} open={open} onOpenChange={onOpenChange}>
       <Drawer.Portal>
         <Drawer.Overlay className="sheet-overlay" />
         <Drawer.Content className="sheet" aria-describedby={undefined}>
-          <div className="sheet-handle" />
-          <Drawer.Title className="sheet-title">Einstellungen</Drawer.Title>
+          <Drawer.Handle className="sheet-handle" preventCycle />
+          <div className="sheet-head">
+            <Drawer.Title className="sheet-title">Einstellungen</Drawer.Title>
+            {/* Ziehen geht nur noch am Griff — also braucht es hier einen Knopf */}
+            <button type="button" className="link-btn" onClick={() => onOpenChange(false)}>Schließen</button>
+          </div>
           <div className="sheet-body sheet-body-plain">
             <div className="field">
               <span>Dein Design</span>

@@ -60,6 +60,11 @@ genau wie bei den beiden anderen Domains auf dem Server.
   `src/share.ts` holt sie dort genau einmal ab. Der Service Worker ruft `skipWaiting()` und
   `clientsClaim()`, sonst wäre er beim ersten Start nicht zuständig und der POST ginge an den Server.
 
+- **Sheets:** Ziehen nur am Griff (`Drawer.Handle` + `handleOnly`), `closeThreshold={0.4}`. Vaul schließt
+  sonst bei jeder Wischgeschwindigkeit über 0,4 px/ms, unabhängig von der Strecke — das lässt sich nicht
+  einstellen, und auf der Karte hätte schon das Verschieben das Sheet geschlossen. Jedes Sheet braucht
+  deshalb einen eigenen Schließen-Knopf.
+
 - **Standort:** Der automatische Standort greift nur, wenn Fotos am Eintrag hängen (`useComposer.ts`) —
   ein reiner Text-Eintrag soll ein reiner Text-Eintrag bleiben. Eigene Ortsnamen (`SavedPlace`) gewinnen
   immer gegen OpenStreetMap, siehe `routes/places.py`.

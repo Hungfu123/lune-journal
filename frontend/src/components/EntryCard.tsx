@@ -141,11 +141,11 @@ export default function EntryCard({ entry, fresh, highlight, onHeart, onDelete, 
 
       {showComments && <Comments entryId={entry.id} onCount={setCount} />}
 
-      <Drawer.Root direction={direction} open={menu} onOpenChange={setMenu}>
+      <Drawer.Root handleOnly closeThreshold={0.4} direction={direction} open={menu} onOpenChange={setMenu}>
         <Drawer.Portal>
           <Drawer.Overlay className="sheet-overlay" />
           <Drawer.Content className="sheet sheet-small" aria-describedby={undefined}>
-            <div className="sheet-handle" />
+            <Drawer.Handle className="sheet-handle" preventCycle />
             <Drawer.Title className="sheet-title">Eintrag vom {dayLabel(entry.date)}</Drawer.Title>
             <HoldToDelete
               onConfirm={() => {

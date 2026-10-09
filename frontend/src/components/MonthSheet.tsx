@@ -12,11 +12,11 @@ interface Props {
 export default function MonthSheet({ open, onOpenChange, current, onPick }: Props) {
   const direction = useSheetDirection()
   return (
-    <Drawer.Root open={open} onOpenChange={onOpenChange} direction={direction}>
+    <Drawer.Root handleOnly closeThreshold={0.4} open={open} onOpenChange={onOpenChange} direction={direction}>
       <Drawer.Portal>
         <Drawer.Overlay className="sheet-overlay" />
         <Drawer.Content className="sheet" aria-describedby={undefined}>
-          <div className="sheet-handle" />
+          <Drawer.Handle className="sheet-handle" preventCycle />
           <MonthGrid
             current={current}
             active={open}

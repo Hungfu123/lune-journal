@@ -145,11 +145,11 @@ export default function MapSheet({ open, onOpenChange, onPick, me }: {
   }, [gezeigt, onPick])
 
   return (
-    <Drawer.Root direction={direction} open={open} onOpenChange={onOpenChange} repositionInputs={false}>
+    <Drawer.Root handleOnly closeThreshold={0.4} direction={direction} open={open} onOpenChange={onOpenChange} repositionInputs={false}>
       <Drawer.Portal>
         <Drawer.Overlay className="sheet-overlay" />
         <Drawer.Content className="sheet sheet-tall" aria-describedby={undefined}>
-          <div className="sheet-handle" />
+          <Drawer.Handle className="sheet-handle" preventCycle />
           <div className="sheet-bar">
             <button type="button" className="link-btn" onClick={() => onOpenChange(false)}>Schließen</button>
             <Drawer.Title className="sheet-bar-title">Eure Orte</Drawer.Title>
