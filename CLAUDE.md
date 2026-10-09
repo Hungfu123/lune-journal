@@ -32,7 +32,9 @@ hinter deren Nginx. Server-Adresse steht nicht im Repo (GitHub-Secret `DEPLOY_HO
   Fotos am Eintrag haben nur `max-width`/`max-height` — nichts wird zugeschnitten. Zugeschnitten wird bewusst
   nur auf dem Cover und in der Monats-Collage. Einträge mit Foto tragen `.mit-foto` und brechen nicht um
   (`break-inside: avoid`), reine Texte dürfen umbrechen, damit keine Lücken entstehen. Die Stimmung steht
-  bewusst nicht im Buch, das Energielevel schon.
+  bewusst nicht im Buch, das Energielevel schon. Auf der Monatsseite steht kein Auszug und keine
+  Collage mehr: beides griff den Eintrag mit den meisten Herzen heraus, der wenige Seiten später
+  ohnehin kommt. Nichts im Buch soll doppelt stehen — Ausnahme ist das Cover.
 - **Desktop ist eigenständig:** Ab 960 px Seitenleiste + Schreibtisch (`DesktopComposer`), ab 1280 px dritte Spalte (`RightRail`). Nicht einfach das Handy-Layout strecken.
 - Gemeinsame Eingabelogik liegt in `src/useComposer.ts` (Handy-Sheet und Desktop nutzen beide).
 - **Live-Updates:** Jede Änderung, die die andere Person sehen soll, ruft `live.publish(...)`

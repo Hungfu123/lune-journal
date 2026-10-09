@@ -128,23 +128,16 @@ def build_context(db: Session, me: User, o: BookOptions) -> dict:
                     })
                 days.append({"day": d.day, "weekday": WEEKDAYS[d.weekday()], "entries": day_entries, "qas": qas_by_day.get(d, [])})
 
-            ranked = sorted(m_entries, key=lambda e: (hearts[e.id], len(photos[e.id])), reverse=True)
-            mosaic_ids = [p.id for e in ranked for p in photos[e.id][:1]][:3]
             m_photo_count = sum(len(photos[e.id]) for e in m_entries)
             total_photos += m_photo_count
-            best_short = next((e for e in ranked if e.kind == "short" and e.text and hearts[e.id]), None)
-            first_qa = next((qas_by_day[d][0] for d in sorted(m_qas)), None)
-            highlight = None
-            if first_qa:
-                highlight = {"label": first_qa["text"], "text": first_qa["answers"][-1]["text"]}
-            elif best_short:
-                highlight = {"label": "Meiste Herzen", "text": best_short.text}
+            # Kein Auszug auf der Monatsseite: egal ob der Eintrag mit den meisten
+            # Herzen oder die erste beantwortete Frage — beides steht wenige
+            # Seiten später wörtlich noch einmal da.
             months.append({
                 "key": f"{cursor:%Y-%m}", "name": MONTHS[cursor.month - 1], "year": cursor.year,
                 "count": len(m_entries), "photo_count": m_photo_count,
                 "places": len({p.place_name for e in m_entries for p in photos[e.id] if p.place_name}),
-                "mosaic": [u for u in (_jpeg(pid, o.quality) for pid in mosaic_ids) if u],
-                "highlight": highlight, "days": days,
+                "days": days,
             })
         cursor = nxt
 

@@ -52,17 +52,15 @@ img { display: block; }
 /* ---------- Monat ---------- */
 /* Nach der Monatsseite frisch anfangen: sonst rutscht der erste Tag als
    Zeilenrest an den unteren Rand der fast leeren Monatsseite. */
-.month { page: divider; break-before: page; break-after: page; display: flex; flex-direction: column; height: calc({{ page_h }} - 40mm); }
+/* Reine Trennseite: Titel mittig statt oben klebend, sonst wirkt die leere
+   untere Hälfte wie ein Versehen. */
+.month { page: divider; break-before: page; break-after: page; display: flex; flex-direction: column;
+  justify-content: center; height: calc({{ page_h }} - 40mm); }
 .month h2 { string-set: month content(); font-size: 40pt; color: var(--me); }
 .month-year { font-family: 'Hand'; font-size: 20pt; color: var(--muted); margin-top: 1mm; }
 .month-stats { margin-top: 5mm; font-size: 8.5pt; color: var(--muted); }
 .month-stats b { color: var(--ink); }
-.month-mosaic { margin-top: auto; padding-top: 5mm; font-size: 0; break-inside: avoid; }
 /* Auch die Monats-Collage passt die Bilder ein statt sie zu beschneiden */
-.month-mosaic .ph { object-fit: contain; background: var(--soft); }
-.month-quote { margin-top: 6mm; padding: 4mm 5mm; background: var(--soft); border-radius: {{ t.radius }}; }
-.month-quote span { font-size: 7.5pt; font-weight: 700; color: var(--muted); }
-.month-quote p { margin: 1mm 0 0; font-family: 'Hand'; font-size: 17pt; line-height: 1.1; }
 
 /* ---------- Timeline ---------- */
 .day { position: relative; padding-left: 17mm; }
@@ -101,8 +99,6 @@ img { display: block; }
 .photos .ph { width: auto; height: auto; object-fit: contain; }
 .photos .ph.solo { max-width: 100%; max-height: 96mm; }
 .photos .ph.duo { max-width: calc(50% - 2.4mm); max-height: 62mm; margin-right: 1.6mm; }
-.month-mosaic .ph.full { height: 58mm; }
-.month-mosaic .ph.l, .month-mosaic .ph.r { height: 42mm; }
 {% if t.key == 'polaroid' %}
 .photos .ph { border: 2.2mm solid #fff; border-bottom-width: 7mm; border-radius: 0; box-shadow: 0 0 0 0.3pt #d8d8d4; }
 {% endif %}
@@ -158,10 +154,6 @@ img { display: block; }
   <h2>{{ m.name }}</h2>
   <div class="month-year">{{ m.year }}</div>
   <div class="month-stats"><b>{{ m.count }}</b> Einträge · <b>{{ m.photo_count }}</b> Fotos{% if m.places %} · <b>{{ m.places }}</b> Orte{% endif %}</div>
-  {% if m.highlight %}
-  <div class="month-quote"><span>{{ m.highlight.label }}</span><p>{{ m.highlight.text }}</p></div>
-  {% endif %}
-  {% if m.mosaic %}<div class="month-mosaic">{% for src in m.mosaic %}<img class="ph {{ layouts[m.mosaic|length][loop.index0] }}" src="{{ src }}">{% endfor %}</div>{% endif %}
 </section>
 
 {% for d in m.days %}
