@@ -147,7 +147,9 @@ cp deploy.sh /opt/lune-journal/deploy.sh   # Deploy-Script an seinen Platz
 ```
 
 Ab dann deployt jeder Push auf `main` von selbst: GitHub Action → SSH → `/opt/lune-journal/deploy.sh`
-→ `git pull` → `docker compose up -d --build`. Dafür braucht das Repo das Secret `DEPLOY_SSH_KEY`.
+→ `git fetch`/`reset --hard` → `docker compose up -d --build`. Das Repo braucht dafür zwei Secrets:
+`DEPLOY_SSH_KEY` (privater Schlüssel, auf dem Server in `authorized_keys` fest auf `deploy.sh`
+verdrahtet) und `DEPLOY_HOST` (Adresse des Servers — die steht bewusst nirgends im Repo).
 
 ### 4. Auf den Handys installieren
 
