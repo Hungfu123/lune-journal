@@ -48,9 +48,8 @@ export default function NewEntrySheet({ open, onOpenChange, onPosted, shared, as
           <div className="sheet-bar">
             <button type="button" className="link-btn" onClick={() => onOpenChange(false)}>Abbrechen</button>
             <Drawer.Title className="sheet-bar-title">Neuer Eintrag</Drawer.Title>
-            <button type="button" className="btn-primary btn-small" disabled={!c.canPost} onClick={c.post}>
-              {c.posting ? 'Postet …' : 'Posten'}
-            </button>
+            {/* Posten sitzt unten im Daumenbereich, oben rechts bleibt frei */}
+            <span className="sheet-bar-platz" aria-hidden="true" />
           </div>
 
           <div className="sheet-body">
@@ -61,10 +60,14 @@ export default function NewEntrySheet({ open, onOpenChange, onPosted, shared, as
               options={[{ value: 'short', label: 'Kurz & knapp' }, { value: 'long', label: 'Tag erzählen' }]}
             />
             {c.kind === 'long' && (
-              <label className="field">
-                <span>Titel</span>
-                <input className="input-title" maxLength={MAX.titel} value={c.title} onChange={(e) => c.setTitle(e.target.value)} placeholder="Sonntag am Rhein" />
-              </label>
+              <input
+                className="input-title"
+                maxLength={MAX.titel}
+                value={c.title}
+                aria-label="Titel"
+                onChange={(e) => c.setTitle(e.target.value)}
+                placeholder="Titel für deinen Tag"
+              />
             )}
             {/* Ohne eigene Zeile für die Beschriftung: der Platzhalter sagt dasselbe */}
             <textarea
@@ -87,6 +90,12 @@ export default function NewEntrySheet({ open, onOpenChange, onPosted, shared, as
               <MoodPicker c={c} />
             </div>
             <EnergyPicker c={c} />
+          </div>
+
+          <div className="sheet-foot">
+            <button type="button" className="btn-primary sheet-post" disabled={!c.canPost} onClick={c.post}>
+              {c.posting ? 'Postet …' : 'Posten'}
+            </button>
           </div>
         </Drawer.Content>
       </Drawer.Portal>

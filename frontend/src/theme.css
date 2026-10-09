@@ -264,12 +264,21 @@ input, textarea, select { font: inherit; color: inherit; }
 .sheet-title { margin: 0 0 14px; font-family: var(--font-display); font-size: 22px; }
 .sheet-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-shrink: 0; }
 .sheet-bar-title { margin: 0; font-size: 16px; font-weight: 700; }
-.sheet-body { flex: 1; overflow-y: auto; display: grid; align-content: start; gap: 18px; padding: 12px 0 calc(28px + env(safe-area-inset-bottom)); }
+/* Hauptaktion unten: oben rechts ist auf einem großen Handy die Ecke, die der
+   Daumen am schlechtesten erreicht. */
+.sheet-foot { flex-shrink: 0; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); background: var(--bg);
+  border-top: 1.5px solid var(--line); }
+.sheet-post { width: 100%; }
+.sheet-bar-platz { width: 44px; }
+
+.sheet-body { flex: 1; overflow-y: auto; display: grid; align-content: start; gap: 18px; padding: 12px 0 16px; }
 
 .field { display: grid; gap: 6px; }
 .field > span { font-size: 14px; font-weight: 700; color: var(--muted); }
 .field input, .field textarea { width: 100%; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 18px; padding: 14px; }
 .input-title { font-family: var(--font-display); font-size: 19px; font-weight: 700; }
+.sheet > .input-title, .sheet-body > .input-title { width: 100%; border: 1.5px solid var(--line);
+  background: var(--surface); color: var(--ink); border-radius: 18px; padding: 12px 14px; }
 .input-hand { height: 130px; resize: none; font-family: var(--font-hand); font-size: 28px; line-height: 1.2; color: var(--me) !important; }
 .input-long { height: 220px; resize: vertical; font-size: 17px; line-height: 1.6; }
 
@@ -393,9 +402,10 @@ input, textarea, select { font: inherit; color: inherit; }
 /* Auf dem Handy zählt jede Zeile. Die Maße sind so gewählt, dass der Eintrag
    auf einen Schirm passt — Trefferflächen bleiben bei 44 px. */
 @media (max-width: 959px) {
-  .sheet-body { gap: 14px; }
+  .sheet-body { gap: 12px; }
   .sheet .input-hand { height: 104px; font-size: 24px; }
-  .sheet .input-long { height: 150px; }
+  /* Kein Anfasser zum Ziehen: daran zieht auf dem Handy niemand */
+  .sheet .input-long { height: 128px; resize: none; }
   .sheet .photo-buttons { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
   .sheet .btn-dashed { flex-direction: column; gap: 3px; min-height: 62px; font-size: 12px; padding: 0 6px;
     line-height: 1.15; text-align: center; }
@@ -406,7 +416,7 @@ input, textarea, select { font: inherit; color: inherit; }
 
 /* Schmale Geräte: das lange Textfeld gibt die letzten Pixel her */
 @media (max-width: 380px) {
-  .sheet .input-long { height: 138px; }
+  .sheet .input-long { height: 104px; }
 }
 
 /* ---------- Ladezustände ---------- */
