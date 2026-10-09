@@ -131,7 +131,6 @@ const DesktopComposer = forwardRef<ComposerHandle, { me: Me; onPosted: (e: Entry
       <div className="desk-more">
         <div className="desk-more-inner">
           <PhotoStrip c={c} reorder />
-          <DateSuggestion c={c} />
           <div className="desk-tools">
             <Segmented
               label="Art des Eintrags"

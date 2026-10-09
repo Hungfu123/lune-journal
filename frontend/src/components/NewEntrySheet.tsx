@@ -66,28 +66,27 @@ export default function NewEntrySheet({ open, onOpenChange, onPosted, shared, as
                 <input className="input-title" maxLength={MAX.titel} value={c.title} onChange={(e) => c.setTitle(e.target.value)} placeholder="Sonntag am Rhein" />
               </label>
             )}
-            <label className="field">
-              <span>{c.kind === 'long' ? 'Erzähl von deinem Tag' : 'Ein Satz zu heute'}</span>
-              <textarea
-                maxLength={MAX.text}
-                className={c.kind === 'long' ? 'input-long' : 'input-hand'}
-                value={c.text}
-                onChange={(e) => c.setText(e.target.value)}
-                placeholder={c.kind === 'long' ? 'Was ist passiert? Was war schön, was lustig?' : 'Heute war …'}
-              />
-            </label>
-            <div className="field">
-              <span>Fotos</span>
-              <PhotoStrip c={c} />
-              <PhotoButtons c={c} />
+            {/* Ohne eigene Zeile für die Beschriftung: der Platzhalter sagt dasselbe */}
+            <textarea
+              maxLength={MAX.text}
+              className={c.kind === 'long' ? 'input-long' : 'input-hand'}
+              value={c.text}
+              aria-label={c.kind === 'long' ? 'Erzähl von deinem Tag' : 'Ein Satz zu heute'}
+              onChange={(e) => c.setText(e.target.value)}
+              placeholder={c.kind === 'long' ? 'Was ist passiert? Was war schön, was lustig?' : 'Heute war …'}
+            />
+            <PhotoStrip c={c} />
+            <PhotoButtons c={c} />
+            {/* Tag und Ort teilen sich eine Zeile — beides ist meist ein Tipp */}
+            <div className="composer-row">
+              <DateSuggestion c={c} />
+              <PlacePicker c={c} immer={askPlace} />
             </div>
-            <DateSuggestion c={c} />
             <div className="field">
               <span>Wie war dein Tag?</span>
               <MoodPicker c={c} />
             </div>
             <EnergyPicker c={c} />
-            <PlacePicker c={c} immer={askPlace} />
           </div>
         </Drawer.Content>
       </Drawer.Portal>

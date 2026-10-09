@@ -58,9 +58,12 @@ export function PlacePicker({ c, immer }: { c: Composer; immer: boolean }) {
   const [offen, setOffen] = useState(immer)
   if (!offen && !c.place) {
     return (
-      <button type="button" className="link-btn place-add" onClick={() => setOffen(true)}>
-        Ort hinzufügen
-      </button>
+      <div className="field">
+        <span>Ort</span>
+        <button type="button" className="chip-btn place-add" onClick={() => setOffen(true)}>
+          Hinzufügen
+        </button>
+      </div>
     )
   }
   return (
@@ -138,7 +141,7 @@ export function DateSuggestion({ c }: { c: Composer }) {
     <div className="field">
       <span>Tag</span>
       <div className="date-row">
-        <label className="date-chip">
+        <label className="chip-btn date-chip">
           {c.entryDate ? shortDate(c.entryDate) : 'Heute'}
           <input
             type="date"

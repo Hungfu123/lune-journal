@@ -389,6 +389,26 @@ input, textarea, select { font: inherit; color: inherit; }
 .lb-meta dt { font-size: 13px; color: var(--muted); }
 .lb-meta dd { margin: 0; font-size: 15px; display: flex; align-items: center; gap: 6px; }
 
+/* ---------- Handy: Formular ohne Scrollen ---------- */
+/* Auf dem Handy zählt jede Zeile. Die Maße sind so gewählt, dass der Eintrag
+   auf einen Schirm passt — Trefferflächen bleiben bei 44 px. */
+@media (max-width: 959px) {
+  .sheet-body { gap: 14px; }
+  .sheet .input-hand { height: 104px; font-size: 24px; }
+  .sheet .input-long { height: 150px; }
+  .sheet .photo-buttons { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .sheet .btn-dashed { flex-direction: column; gap: 3px; min-height: 62px; font-size: 12px; padding: 0 6px;
+    line-height: 1.15; text-align: center; }
+  .sheet .mood { min-height: 44px; font-size: 13px; }
+  .sheet .energy-cell { height: 30px; }
+  .sheet .field > span { font-size: 13px; }
+}
+
+/* Schmale Geräte: das lange Textfeld gibt die letzten Pixel her */
+@media (max-width: 380px) {
+  .sheet .input-long { height: 138px; }
+}
+
 /* ---------- Ladezustände ---------- */
 /* Nur die Deckkraft pulsiert — kein Verschieben von Hintergründen, das wäre
    Bewegung ohne Aussage. */
@@ -426,20 +446,26 @@ input, textarea, select { font: inherit; color: inherit; }
   font-family: var(--font-body); font-size: 15px; }
 .comment-write .btn-small { flex-shrink: 0; }
 
+/* ---------- Eingabe: zwei Dinge nebeneinander ---------- */
+.composer-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: start; }
+.composer-row > .field { min-width: 0; }
+
 /* ---------- Tag des Eintrags ---------- */
 .date-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 /* Das echte Eingabefeld liegt unsichtbar über dem Chip: ein Tipp, nativer Kalender */
-.date-chip { position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
-  padding: 0 16px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface);
-  font-size: 15px; font-weight: 700; cursor: pointer; }
-.date-chip input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; border: none; cursor: pointer; }
-.date-chip:focus-within { outline: 3px solid var(--me); outline-offset: 2px; }
+.chip-btn { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1.5px solid var(--line);
+  background: var(--surface); color: var(--ink); font-size: 15px; font-weight: 700; cursor: pointer; }
+.date-chip { justify-self: start; }
+.chip-btn input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; border: none; cursor: pointer; }
+.chip-btn:focus-within { outline: 3px solid var(--me); outline-offset: 2px; }
 
 /* ---------- Ort ---------- */
 .place-row { display: flex; gap: 8px; align-items: stretch; }
 .place-row input { flex: 1; min-width: 0; }
 .place-row .btn-secondary { flex-shrink: 0; white-space: nowrap; }
-.place-add { justify-self: start; color: var(--me); }
+/* Gleiche Anmutung wie der Tag-Chip daneben — nicht wie ein Link */
+.place-add { justify-self: start; }
 
 /* ---------- Energie ---------- */
 /* Zehn Felder, die sich füllen — angelehnt an eine Energieleiste im Spiel,
