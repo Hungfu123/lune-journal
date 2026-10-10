@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { MAX } from '../limits'
 import { Drawer } from 'vaul'
 import type { SharedContent } from '../share'
@@ -6,6 +6,8 @@ import { useComposer } from '../useComposer'
 import { useSheetDirection } from '../useMedia'
 import type { Entry } from '../types'
 import { DateSuggestion, EnergyPicker, MoodPicker, PhotoButtons, PhotoStrip, PlacePicker } from './ComposerParts'
+import FocusWriter from './FocusWriter'
+import { Expand } from './Icons'
 import Segmented from './Segmented'
 
 interface Props {
@@ -23,6 +25,7 @@ interface Props {
 /** Handy: neuer Eintrag als Sheet von unten. */
 export default function NewEntrySheet({ open, onOpenChange, onPosted, shared, askPlace = false, autoLocation = false }: Props) {
   const direction = useSheetDirection()
+  const [fokus, setFokus] = useState(false)
   const c = useComposer((e) => {
     onOpenChange(false)
     onPosted(e)
@@ -48,8 +51,15 @@ export default function NewEntrySheet({ open, onOpenChange, onPosted, shared, as
           <div className="sheet-bar">
             <button type="button" className="link-btn" onClick={() => onOpenChange(false)}>Abbrechen</button>
             <Drawer.Title className="sheet-bar-title">Neuer Eintrag</Drawer.Title>
-            {/* Posten sitzt unten im Daumenbereich, oben rechts bleibt frei */}
-            <span className="sheet-bar-platz" aria-hidden="true" />
+            {/* Posten sitzt unten im Daumenbereich. Oben rechts liegt der
+                Fokus-Modus — selten gebraucht, dafür ist die Ecke richtig. */}
+            {c.kind === 'long' ? (
+              <button type="button" className="icon-btn" aria-label="Ablenkungsfrei schreiben" onClick={() => setFokus(true)}>
+                <Expand />
+              </button>
+            ) : (
+              <span className="sheet-bar-platz" aria-hidden="true" />
+            )}
           </div>
 
           <div className="sheet-body sheet-body-eintrag">
@@ -97,6 +107,8 @@ export default function NewEntrySheet({ open, onOpenChange, onPosted, shared, as
               {c.posting ? 'Postet …' : 'Posten'}
             </button>
           </div>
+          {/* Innerhalb des Sheets, sonst schluckt dessen Überlagerung die Tipps */}
+          {fokus && <FocusWriter c={c} onClose={() => setFokus(false)} imPortal={false} />}
         </Drawer.Content>
       </Drawer.Portal>
     </Drawer.Root>

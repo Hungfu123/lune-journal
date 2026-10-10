@@ -402,13 +402,21 @@ input, textarea, select { font: inherit; color: inherit; }
    oben und über dem Posten-Knopf steht ein Loch, das wie ein vergessener
    Abschnitt aussieht. */
 .sheet-body-eintrag { display: flex; flex-direction: column; }
-.sheet-body-eintrag > .input-hand, .sheet-body-eintrag > .input-long { flex: 1 1 auto; }
+/* min-height ist Pflicht: als Flex-Kind schrumpft ein Textfeld sonst unter
+   seinen Inhalt — bei offener Tastatur blieb ein 6 px hoher Schlitz übrig. */
+.sheet-body-eintrag > .input-hand { flex: 1 1 auto; min-height: 104px; }
+.sheet-body-eintrag > .input-long { flex: 1 1 auto; min-height: 128px; }
 
 /* ---------- Handy: Formular ohne Scrollen ---------- */
 /* Auf dem Handy zählt jede Zeile. Die Maße sind so gewählt, dass der Eintrag
    auf einen Schirm passt — Trefferflächen bleiben bei 44 px. */
 @media (max-width: 959px) {
   .sheet-body { gap: 12px; }
+  /* Tastenhinweise ergeben auf dem Handy keinen Sinn */
+  .focus-bar kbd { display: none; }
+  /* In einer Zeile halten: zweizeilig springt die Leiste beim Tippen */
+  .focus-lesezeit { display: none; }
+  .focus-page { margin: 3vh auto 12vh; padding: 0 18px; }
   .sheet .input-hand { height: 104px; font-size: 24px; }
   /* Kein Anfasser zum Ziehen: daran zieht auf dem Handy niemand */
   .sheet .input-long { height: 128px; resize: none; }
@@ -423,6 +431,7 @@ input, textarea, select { font: inherit; color: inherit; }
 /* Schmale Geräte: das lange Textfeld gibt die letzten Pixel her */
 @media (max-width: 380px) {
   .sheet .input-long { height: 104px; }
+  .sheet-body-eintrag > .input-long { min-height: 104px; }
 }
 
 /* ---------- Ladezustände ---------- */
@@ -830,15 +839,22 @@ button.avatars { padding: 0; }
 .drop-box span { font-size: 15px; color: var(--muted); }
 
 /* Fokus-Modus */
+/* Im Sheet gerendert: Vaul verschiebt das Sheet per transform, und ein
+   transformierter Vorfahr macht aus position: fixed ein absolute. Dann wäre
+   die Fläche am Sheet-Innenraum ausgerichtet statt am Bildschirm. */
+.focus-im-sheet { position: absolute !important; }
 .focus { position: fixed; inset: 0; z-index: 65; background: var(--bg); overflow-y: auto; opacity: 1; transform: none;
   transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out); }
 @starting-style { .focus { opacity: 0; transform: scale(0.98); } }
 .focus-bar { position: sticky; top: 0; display: flex; align-items: center; gap: 16px; padding: 14px 28px; background: var(--bg); }
 .focus-count { flex: 1; text-align: center; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .focus-page { max-width: 680px; margin: 6vh auto 20vh; padding: 0 24px; display: grid; gap: 18px; }
-.focus-title { border: none; background: none; outline: none; color: var(--ink); font-family: var(--font-display); font-weight: var(--display-weight);
+.focus-title { width: 100%; box-sizing: border-box; border: none; background: none; outline: none; color: var(--ink); font-family: var(--font-display); font-weight: var(--display-weight);
   font-variation-settings: var(--display-variation); letter-spacing: var(--display-tracking); font-size: 44px; line-height: 1.1; }
-.focus-text { border: none; background: none; outline: none; resize: none; overflow: hidden; color: var(--ink); font-size: 20px; line-height: 1.8; }
+/* Ohne width nimmt ein Textfeld die Browser-Vorgabe (20 Zeichen breit) und
+   schert aus dem Satzspiegel aus — auf schmalen Geräten läuft der Text raus. */
+.focus-text { width: 100%; box-sizing: border-box; border: none; background: none; outline: none; resize: none;
+  overflow: hidden; color: var(--ink); font-size: 20px; line-height: 1.8; }
 .focus-text::placeholder, .focus-title::placeholder { color: color-mix(in srgb, var(--muted) 60%, transparent); }
 
 /* Foto groß */
