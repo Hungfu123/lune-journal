@@ -20,7 +20,10 @@ hinter deren Nginx. Server-Adresse steht nicht im Repo (GitHub-Secret `DEPLOY_HO
 
 ## Regeln
 - **Sprache:** Alle Texte in der App auf Deutsch, Satzanfang groß, aktiv, kurz. Fehlertexte sagen, was passiert ist und was zu tun ist.
-- **Zugang:** Nur die zwei Adressen aus `ALLOWED_EMAILS`. Jeder neue Endpunkt braucht `Depends(current_user)`. Bilder nie als öffentlichen Ordner ausliefern.
+- **Zugang:** Nur die zwei Adressen aus `ALLOWED_EMAILS`. Verglichen wird über `normalize_email()`
+  (`config.py`): bei Google sind `googlemail.com` und `gmail.com` dasselbe Konto, Punkte im Namen zählen
+  nicht und alles nach einem Plus ist Beiwerk. Auch die Nutzersuche beim Login geht über die
+  Vergleichsform — sonst entsteht pro Schreibweise ein eigener Nutzer und die Partner-Logik bricht. Jeder neue Endpunkt braucht `Depends(current_user)`. Bilder nie als öffentlichen Ordner ausliefern.
 - **Fotos:** Ausgelieferte WebP-Bilder enthalten keine EXIF/GPS-Daten. Originale bleiben in `data/originals` für den Druck.
 - **Animationen nach Emil Kowalski:**
   - Häufige Aktionen (Navigation, Filter, Herzen) nicht oder kaum animieren, Tastatur-Aktionen nie.

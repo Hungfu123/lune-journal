@@ -3,6 +3,26 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+GOOGLE_DOMAINS = {"gmail.com", "googlemail.com"}
+
+
+def normalize_email(adresse: str) -> str:
+    """Vergleichsform einer Adresse.
+
+    Google behandelt mehrere Schreibweisen als dasselbe Konto: googlemail.com
+    und gmail.com sind identisch, Punkte im Namen zählen nicht, und alles nach
+    einem Plus ist Beiwerk. Ohne das sperrt die Zugangsliste jemanden aus, nur
+    weil auf dem Handy die alte Domain hinterlegt ist.
+    """
+    adresse = adresse.strip().lower()
+    name, trenner, domain = adresse.partition("@")
+    if not trenner:
+        return adresse
+    if domain in GOOGLE_DOMAINS:
+        name = name.split("+", 1)[0].replace(".", "")
+        domain = "gmail.com"
+    return f"{name}@{domain}"
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
@@ -22,7 +42,9 @@ class Settings(BaseSettings):
 
     @cached_property
     def allowed(self) -> set[str]:
-        return {e.strip().lower() for e in self.allowed_emails.split(",") if e.strip()}
+        """In Vergleichsform, damit anne.steinfort@googlemail.com genauso
+        hereinkommt wie annesteinfort@gmail.com."""
+        return {normalize_email(e) for e in self.allowed_emails.split(",") if e.strip()}
 
     @property
     def media_dir(self) -> Path:

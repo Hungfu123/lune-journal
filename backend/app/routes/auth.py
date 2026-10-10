@@ -4,7 +4,7 @@ from google.oauth2 import id_token
 from pydantic import BaseModel, Field
 from sqlmodel import Session, select
 
-from ..config import settings
+from ..config import normalize_email, settings
 from ..db import get_db
 from ..limiter import limiter
 from ..models import LoginSession, User
@@ -40,11 +40,14 @@ def login_google(request: Request, body: GoogleLogin, response: Response, db: Se
         info = id_token.verify_oauth2_token(body.credential, google_requests.Request(), settings.google_client_id)
     except ValueError:
         raise HTTPException(401, "Anmeldung fehlgeschlagen. Bitte noch einmal versuchen.")
-    email = (info.get("email") or "").lower()
-    if not info.get("email_verified") or email not in settings.allowed:
+    email = (info.get("email") or "").strip().lower()
+    vergleich = normalize_email(email)
+    if not info.get("email_verified") or vergleich not in settings.allowed:
         raise HTTPException(403, "Diese App ist privat. Mit diesem Google-Konto gibt es keinen Zugriff.")
 
-    user = db.exec(select(User).where(User.email == email)).first()
+    # Nach Vergleichsform suchen: dieselbe Person darf nicht zweimal angelegt
+    # werden, nur weil sie sich mal mit googlemail.com anmeldet
+    user = next((u for u in db.exec(select(User)).all() if normalize_email(u.email) == vergleich), None)
     if not user:
         user = User(email=email, name=info.get("given_name") or email.split("@")[0])
         db.add(user)

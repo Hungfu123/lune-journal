@@ -491,3 +491,30 @@ def test_edit_keeps_photos_and_drops_stale_coordinates(as_user, no_network):
     assert len(neu["photos"]) == 1, "Fotos dürfen beim Bearbeiten nicht verschwinden"
     # Nur Text gelöscht, Foto bleibt: der Eintrag ist weiter gültig
     assert c.patch(f"/api/entries/{e['id']}", json={"kind": "short", "text": ""}).status_code == 200
+
+
+# ---------- Schreibweisen derselben Google-Adresse ----------
+
+def test_google_address_variants_are_one_account(as_user, monkeypatch):
+    """googlemail.com, Punkte und +Zusatz sind bei Google dasselbe Konto."""
+    import app.routes.auth as auth
+    from app.config import normalize_email
+
+    assert normalize_email("Anne.Steinfort@googlemail.com") == "annesteinfort@gmail.com"
+    assert normalize_email("annesteinfort+tagebuch@gmail.com") == "annesteinfort@gmail.com"
+    assert normalize_email("Hung@Example.com") == "hung@example.com"  # andere Domains unverändert
+
+    c = as_user(None)
+    for schreibweise in ("h.u.n.g@example.com", "HUNG+privat@example.com"):
+        monkeypatch.setattr(auth.id_token, "verify_oauth2_token",
+                            lambda *a, **k: {"email": schreibweise, "email_verified": True, "given_name": "Hung"})
+        r = c.post("/api/auth/google", json={"credential": "x"})
+        assert r.status_code == 403, f"{schreibweise} gehört nicht zu einer Google-Domain"
+
+    # Mit echter Google-Domain in der Zugangsliste greift die Vergleichsform
+    monkeypatch.setattr(auth.settings.__class__, "allowed",
+                        property(lambda self: {"annesteinfort@gmail.com"}))
+    monkeypatch.setattr(auth.id_token, "verify_oauth2_token",
+                        lambda *a, **k: {"email": "Anne.Steinfort@googlemail.com", "email_verified": True, "given_name": "Anne"})
+    r = c.post("/api/auth/google", json={"credential": "x"})
+    assert r.status_code == 200, "googlemail-Schreibweise muss hereinkommen"
