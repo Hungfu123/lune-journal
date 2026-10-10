@@ -413,10 +413,15 @@ input, textarea, select { font: inherit; color: inherit; }
 @media (max-width: 959px) {
   .sheet-body { gap: 12px; }
   /* Tastenhinweise ergeben auf dem Handy keinen Sinn */
-  .focus-bar kbd { display: none; }
+  .focus .focus-bar kbd { display: none; }
   /* In einer Zeile halten: zweizeilig springt die Leiste beim Tippen */
-  .focus-lesezeit { display: none; }
-  .focus-page { margin: 3vh auto 12vh; padding: 0 18px; }
+  .focus .focus-lesezeit { display: none; }
+  /* Zwei Klassen tief: die Grundregeln für den Fokus-Modus stehen in dieser
+     Datei weiter unten und würden sonst gewinnen. */
+  .focus .focus-page { margin: 3vh auto 12vh; padding: 0 18px; }
+  /* 44 px Display-Schrift sind auf 390 px Breite rund acht Zeichen pro Zeile */
+  .focus .focus-title { font-size: 30px; }
+  .focus .focus-bar { padding: 12px 18px; }
   .sheet .input-hand { height: 104px; font-size: 24px; }
   /* Kein Anfasser zum Ziehen: daran zieht auf dem Handy niemand */
   .sheet .input-long { height: 128px; resize: none; }
@@ -846,7 +851,9 @@ button.avatars { padding: 0; }
 .focus { position: fixed; inset: 0; z-index: 65; background: var(--bg); overflow-y: auto; opacity: 1; transform: none;
   transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out); }
 @starting-style { .focus { opacity: 0; transform: scale(0.98); } }
-.focus-bar { position: sticky; top: 0; display: flex; align-items: center; gap: 16px; padding: 14px 28px; background: var(--bg); }
+.focus-bar { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 16px; padding: 14px 28px; background: var(--bg); }
+/* Der wichtigste Knopf im Schreibmodus war der kleinste */
+.focus-bar .btn-small { min-height: 44px; }
 .focus-count { flex: 1; text-align: center; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .focus-page { max-width: 680px; margin: 6vh auto 20vh; padding: 0 24px; display: grid; gap: 18px; }
 .focus-title { width: 100%; box-sizing: border-box; border: none; background: none; outline: none; color: var(--ink); font-family: var(--font-display); font-weight: var(--display-weight);
@@ -856,6 +863,8 @@ button.avatars { padding: 0; }
 .focus-text { width: 100%; box-sizing: border-box; border: none; background: none; outline: none; resize: none;
   overflow: hidden; color: var(--ink); font-size: 20px; line-height: 1.8; }
 .focus-text::placeholder, .focus-title::placeholder { color: color-mix(in srgb, var(--muted) 60%, transparent); }
+/* outline: none oben nimmt auch den Tastaturfokus weg — hier zurückholen */
+.focus-text:focus-visible, .focus-title:focus-visible { outline: 3px solid var(--me); outline-offset: 6px; border-radius: 4px; }
 
 /* Foto groß */
 .lb { position: fixed; inset: 0; z-index: 62; display: grid; place-items: center; background: #0f0c12; opacity: 1; transition: opacity 200ms ease; }
