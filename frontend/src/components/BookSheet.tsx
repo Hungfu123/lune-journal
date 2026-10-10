@@ -97,14 +97,14 @@ export default function BookSheet({ open, onOpenChange, me }: { open: boolean; o
 
   return (
     <>
-    <Drawer.Root handleOnly closeThreshold={0.4} direction={direction} open={open} onOpenChange={(o) => { onOpenChange(o); if (!o && state !== 'working') setState('idle') }}>
+    <Drawer.Root closeThreshold={0.4} direction={direction} open={open} onOpenChange={(o) => { onOpenChange(o); if (!o && state !== 'working') setState('idle') }}>
       <Drawer.Portal>
         <Drawer.Overlay className="sheet-overlay" />
         <Drawer.Content className="sheet sheet-tall book-sheet" aria-describedby={undefined}>
           <Drawer.Handle className="sheet-handle" preventCycle />
           <Drawer.Title className="sheet-title">Euer Buch</Drawer.Title>
 
-          <div className="sheet-body sheet-body-plain">
+          <div className="sheet-body sheet-body-plain" data-vaul-no-drag>
             <div className="book-stage" aria-hidden="true">
               <div className="book" data-theme={theme} data-state={state}>
                 <div className="book-pages">

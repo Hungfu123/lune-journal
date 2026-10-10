@@ -44,13 +44,13 @@ export default function AskSheet({ open, onOpenChange, partnerName, onAsked }: P
   }
 
   return (
-    <Drawer.Root handleOnly closeThreshold={0.4} direction={direction} open={open} onOpenChange={onOpenChange} repositionInputs={false}>
+    <Drawer.Root closeThreshold={0.4} direction={direction} open={open} onOpenChange={onOpenChange} repositionInputs={false}>
       <Drawer.Portal>
         <Drawer.Overlay className="sheet-overlay" />
         <Drawer.Content className="sheet" aria-describedby={undefined}>
           <Drawer.Handle className="sheet-handle" preventCycle />
           <Drawer.Title className="sheet-title">Frage an {partnerName}</Drawer.Title>
-          <div className="sheet-body sheet-body-plain">
+          <div className="sheet-body sheet-body-plain" data-vaul-no-drag>
             <label className="field">
               <span>Deine Frage</span>
               <textarea className="input-question" maxLength={MAX.frage} value={text} onChange={(e) => setText(e.target.value)} placeholder="Was wolltest du schon immer wissen?" />

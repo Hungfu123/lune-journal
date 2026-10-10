@@ -145,7 +145,7 @@ export default function MapSheet({ open, onOpenChange, onPick, me }: {
   }, [gezeigt, onPick])
 
   return (
-    <Drawer.Root handleOnly closeThreshold={0.4} direction={direction} open={open} onOpenChange={onOpenChange} repositionInputs={false}>
+    <Drawer.Root closeThreshold={0.4} direction={direction} open={open} onOpenChange={onOpenChange} repositionInputs={false}>
       <Drawer.Portal>
         <Drawer.Overlay className="sheet-overlay" />
         <Drawer.Content className="sheet sheet-tall" aria-describedby={undefined}>
@@ -157,7 +157,7 @@ export default function MapSheet({ open, onOpenChange, onPick, me }: {
           </div>
 
           {points && points.length > 0 && (
-            <div className="map-filter">
+            <div className="map-filter" data-vaul-no-drag>
               <Segmented
                 label="Wessen Orte"
                 value={wer}
@@ -188,7 +188,7 @@ export default function MapSheet({ open, onOpenChange, onPick, me }: {
             </div>
           )}
 
-          <div className="map-wrap">
+          <div className="map-wrap" data-vaul-no-drag>
             {!points && (
               <p className="map-hint"><Spinner label="Karte lädt" /> Orte werden geladen …</p>
             )}

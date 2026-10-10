@@ -147,7 +147,7 @@ export default function EntryCard({ entry, fresh, highlight, onHeart, onDelete, 
 
       {showComments && <Comments entryId={entry.id} onCount={setCount} />}
 
-      <Drawer.Root handleOnly closeThreshold={0.4} direction={direction} open={menu} onOpenChange={setMenu}>
+      <Drawer.Root closeThreshold={0.4} direction={direction} open={menu} onOpenChange={setMenu}>
         <Drawer.Portal>
           <Drawer.Overlay className="sheet-overlay" />
           <Drawer.Content className="sheet sheet-small" aria-describedby={undefined}>

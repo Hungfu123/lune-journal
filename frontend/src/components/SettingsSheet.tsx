@@ -68,7 +68,7 @@ export default function SettingsSheet({ open, onOpenChange, me, onMeChange }: Pr
   }
 
   return (
-    <Drawer.Root handleOnly closeThreshold={0.4} direction={direction} open={open} onOpenChange={onOpenChange}>
+    <Drawer.Root closeThreshold={0.4} direction={direction} open={open} onOpenChange={onOpenChange}>
       <Drawer.Portal>
         <Drawer.Overlay className="sheet-overlay" />
         <Drawer.Content className="sheet" aria-describedby={undefined}>
@@ -78,7 +78,7 @@ export default function SettingsSheet({ open, onOpenChange, me, onMeChange }: Pr
             {/* Ziehen geht nur noch am Griff — also braucht es hier einen Knopf */}
             <button type="button" className="link-btn" onClick={() => onOpenChange(false)}>Schließen</button>
           </div>
-          <div className="sheet-body sheet-body-plain">
+          <div className="sheet-body sheet-body-plain" data-vaul-no-drag>
             <div className="field">
               <span>Dein Design</span>
               <div className="theme-grid">

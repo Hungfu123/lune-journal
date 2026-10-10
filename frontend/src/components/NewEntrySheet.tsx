@@ -45,7 +45,7 @@ export default function NewEntrySheet({ open, onOpenChange, onPosted, shared, as
   }, [open, shared])
 
   return (
-    <Drawer.Root handleOnly closeThreshold={0.4} direction={direction} open={open} onOpenChange={onOpenChange} repositionInputs={false}>
+    <Drawer.Root closeThreshold={0.4} direction={direction} open={open} onOpenChange={onOpenChange} repositionInputs={false}>
       <Drawer.Portal>
         <Drawer.Overlay className="sheet-overlay" />
         <Drawer.Content className="sheet sheet-tall" aria-describedby={undefined}>
@@ -64,7 +64,7 @@ export default function NewEntrySheet({ open, onOpenChange, onPosted, shared, as
             )}
           </div>
 
-          <div className="sheet-body sheet-body-eintrag">
+          <div className="sheet-body sheet-body-eintrag" data-vaul-no-drag>
             <Segmented
               label="Art des Eintrags"
               value={c.kind}
@@ -108,7 +108,7 @@ export default function NewEntrySheet({ open, onOpenChange, onPosted, shared, as
             <EnergyPicker c={c} />
           </div>
 
-          <div className="sheet-foot">
+          <div className="sheet-foot" data-vaul-no-drag>
             <button type="button" className="btn-primary sheet-post" disabled={!c.canPost} onClick={c.post}>
               {c.posting ? (bearbeiten ? 'Speichert …' : 'Postet …') : bearbeiten ? 'Speichern' : 'Posten'}
             </button>
