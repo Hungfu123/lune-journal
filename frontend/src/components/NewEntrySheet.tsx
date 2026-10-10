@@ -20,16 +20,18 @@ interface Props {
   askPlace?: boolean
   /** Einstellung „Standort automatisch mitgeben" */
   autoLocation?: boolean
+  /** Gesetzt: dieser Eintrag wird geändert statt ein neuer angelegt */
+  bearbeiten?: Entry | null
 }
 
 /** Handy: neuer Eintrag als Sheet von unten. */
-export default function NewEntrySheet({ open, onOpenChange, onPosted, shared, askPlace = false, autoLocation = false }: Props) {
+export default function NewEntrySheet({ open, onOpenChange, onPosted, shared, askPlace = false, autoLocation = false, bearbeiten = null }: Props) {
   const direction = useSheetDirection()
   const [fokus, setFokus] = useState(false)
   const c = useComposer((e) => {
     onOpenChange(false)
     onPosted(e)
-  }, autoLocation && open)
+  }, autoLocation && open && !bearbeiten, bearbeiten)
 
   // Geteilte Fotos genau einmal übernehmen, nicht bei jedem Rendern
   const übernommen = useRef<SharedContent | null>(null)
@@ -50,7 +52,7 @@ export default function NewEntrySheet({ open, onOpenChange, onPosted, shared, as
           <Drawer.Handle className="sheet-handle" preventCycle />
           <div className="sheet-bar">
             <button type="button" className="link-btn" onClick={() => onOpenChange(false)}>Abbrechen</button>
-            <Drawer.Title className="sheet-bar-title">Neuer Eintrag</Drawer.Title>
+            <Drawer.Title className="sheet-bar-title">{bearbeiten ? 'Eintrag ändern' : 'Neuer Eintrag'}</Drawer.Title>
             {/* Posten sitzt unten im Daumenbereich. Oben rechts liegt der
                 Fokus-Modus — selten gebraucht, dafür ist die Ecke richtig. */}
             {c.kind === 'long' ? (
@@ -88,8 +90,12 @@ export default function NewEntrySheet({ open, onOpenChange, onPosted, shared, as
               onChange={(e) => c.setText(e.target.value)}
               placeholder={c.kind === 'long' ? 'Was ist passiert? Was war schön, was lustig?' : 'Heute war …'}
             />
-            <PhotoStrip c={c} />
-            <PhotoButtons c={c} />
+            {!bearbeiten && (
+              <>
+                <PhotoStrip c={c} />
+                <PhotoButtons c={c} />
+              </>
+            )}
             {/* Tag und Ort teilen sich eine Zeile — beides ist meist ein Tipp */}
             <div className="composer-row">
               <DateSuggestion c={c} />
@@ -104,7 +110,7 @@ export default function NewEntrySheet({ open, onOpenChange, onPosted, shared, as
 
           <div className="sheet-foot">
             <button type="button" className="btn-primary sheet-post" disabled={!c.canPost} onClick={c.post}>
-              {c.posting ? 'Postet …' : 'Posten'}
+              {c.posting ? (bearbeiten ? 'Speichert …' : 'Postet …') : bearbeiten ? 'Speichern' : 'Posten'}
             </button>
           </div>
           {/* Innerhalb des Sheets, sonst schluckt dessen Überlagerung die Tipps */}

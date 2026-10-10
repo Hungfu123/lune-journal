@@ -454,6 +454,12 @@ input, textarea, select { font: inherit; color: inherit; }
 .spinner svg { animation: spinner-dreht 800ms linear infinite; }
 @keyframes spinner-dreht { to { transform: rotate(360deg); } }
 
+/* Nachträglich geändert — leise, aber ehrlich */
+.bearbeitet-hinweis { font-style: normal; }
+.bearbeitet-hinweis::before { content: ' · '; }
+
+.menu-aktion { width: 100%; margin-bottom: 10px; }
+
 /* ---------- Kommentare ---------- */
 .comments { display: grid; gap: 10px; margin-top: 12px; padding-top: 12px; border-top: 1.5px dashed var(--line);
   opacity: 1; transform: none; transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out); }

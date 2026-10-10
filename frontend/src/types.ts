@@ -33,6 +33,7 @@ export interface Entry {
   mood: string
   energy: number | null
   created_at: string
+  edited: boolean
   author: { id: number; name: string }
   mine: boolean
   photos: Photo[]
@@ -60,6 +61,7 @@ export interface Comment {
   id: number
   text: string
   created_at: string
+  edited: boolean
   author: { id: number; name: string }
   mine: boolean
 }

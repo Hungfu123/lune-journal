@@ -41,6 +41,7 @@ _NEW_COLUMNS = {
         "place": "TEXT NOT NULL DEFAULT ''",
         "lat": "REAL",
         "lon": "REAL",
+        "edited_at": "DATETIME",
     },
 }
 

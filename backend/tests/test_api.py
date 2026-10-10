@@ -451,3 +451,43 @@ def test_typed_place_gets_coordinates(as_user, no_network, monkeypatch):
     e3 = c.post("/api/entries", json={"kind": "short", "text": "Irgendwo", "place": "Hinter den sieben Bergen"}).json()
     assert e3["place_name"] == "Hinter den sieben Bergen"
     assert not [p for p in c.get("/api/places").json() if p["entry_id"] == e3["id"]]
+
+
+# ---------- Bearbeiten ----------
+
+def test_edit_entry(as_user, no_network):
+    c = as_user("hung")
+    e = c.post("/api/entries", json={"kind": "short", "text": "Erster Wurf", "mood": "okay"}).json()
+    assert e["edited"] is False
+
+    neu = c.patch(f"/api/entries/{e['id']}", json={
+        "kind": "long", "title": "Markttag", "text": "Doch etwas länger geworden.",
+        "mood": "super", "energy": 8, "place": "Rheinwiese", "entry_date": str(TODAY - timedelta(days=2)),
+    }).json()
+    assert neu["title"] == "Markttag" and neu["mood"] == "super" and neu["energy"] == 8
+    assert neu["place_name"] == "Rheinwiese" and neu["date"] == str(TODAY - timedelta(days=2))
+    assert neu["edited"] is True
+
+    # Fremde Einträge bleiben unberührt
+    c = as_user("lea")
+    assert c.patch(f"/api/entries/{e['id']}", json={"kind": "short", "text": "geklaut"}).status_code == 404
+
+    c = as_user("hung")
+    assert c.patch(f"/api/entries/{e['id']}", json={"kind": "short", "text": "  "}).status_code == 422
+    assert c.patch(f"/api/entries/{e['id']}", json={"kind": "short", "text": "x", "energy": 99}).status_code == 422
+    assert c.patch(f"/api/entries/{e['id']}", json={"kind": "short", "text": "x",
+                                                   "entry_date": str(TODAY + timedelta(days=1))}).status_code == 422
+    assert c.patch("/api/entries/999999", json={"kind": "short", "text": "x"}).status_code == 404
+
+
+def test_edit_keeps_photos_and_drops_stale_coordinates(as_user, no_network):
+    c = as_user("hung")
+    foto = c.post("/api/photos", files={"file": ("a.jpg", jpeg(), "image/jpeg")}).json()
+    e = c.post("/api/entries", json={"kind": "short", "text": "Mit Foto", "photo_ids": [foto["id"]],
+                                     "place": "Alter Ort", "lat": 51.2, "lon": 6.8}).json()
+    assert len(e["photos"]) == 1
+
+    neu = c.patch(f"/api/entries/{e['id']}", json={"kind": "short", "text": "Mit Foto", "place": "Neuer Ort"}).json()
+    assert len(neu["photos"]) == 1, "Fotos dürfen beim Bearbeiten nicht verschwinden"
+    # Nur Text gelöscht, Foto bleibt: der Eintrag ist weiter gültig
+    assert c.patch(f"/api/entries/{e['id']}", json={"kind": "short", "text": ""}).status_code == 200

@@ -13,7 +13,7 @@ from ..db import get_db
 from .. import geocode
 from ..images import delete_files, media_path
 from ..live import publish
-from ..models import Comment, Entry, Photo, Reaction, User
+from ..models import Comment, Entry, Photo, Reaction, User, utcnow
 from ..push import notify_others
 from ..security import current_user, signed_media_url
 from ..db import engine
@@ -54,6 +54,7 @@ def entries_out(db: Session, entries: list[Entry], me: User) -> list[dict]:
             "mood": e.mood,
             "energy": e.energy,
             "created_at": e.created_at.isoformat(),
+            "edited": e.edited_at is not None,
             "author": {"id": e.user_id, "name": users[e.user_id].name},
             "mine": e.user_id == me.id,
             "photos": ph,
@@ -197,6 +198,50 @@ def create_entry(body: EntryIn, bg: BackgroundTasks, user: User = Depends(curren
     bg.add_task(_notify_new_entry, entry, user, photos[0].id if photos else None)
     publish("entry", user.id)
     return entries_out(db, [entry], user)[0]
+
+
+class EntryEdit(BaseModel):
+    kind: str = Field("short", pattern="^(short|long)$")
+    title: str = Field("", max_length=120)
+    text: str = Field("", max_length=20000)
+    mood: str = ""
+    energy: int | None = Field(None, ge=1, le=10)
+    place: str = Field("", max_length=120)
+    entry_date: date | None = None
+
+
+@router.patch("/entries/{entry_id}")
+def edit_entry(entry_id: int, body: EntryEdit, bg: BackgroundTasks,
+               user: User = Depends(current_user), db: Session = Depends(get_db)):
+    """Nachträglich ändern — Fotos bleiben, wie sie sind."""
+    e = db.get(Entry, entry_id)
+    if not e or e.user_id != user.id:
+        raise HTTPException(404, "Eintrag nicht gefunden")
+    if body.mood not in MOODS:
+        raise HTTPException(422, "Unbekannte Stimmung")
+    neues_datum = body.entry_date or e.entry_date
+    if neues_datum > today():
+        raise HTTPException(422, "Einträge in der Zukunft gehen nicht.")
+    hat_fotos = db.exec(select(Photo).where(Photo.entry_id == e.id)).first() is not None
+    if not body.text.strip() and not hat_fotos:
+        raise HTTPException(422, "Schreib etwas oder lass ein Foto stehen.")
+
+    ort_vorher = e.place
+    e.kind, e.title, e.text = body.kind, body.title.strip(), body.text.strip()
+    e.mood, e.energy, e.place = body.mood, body.energy, body.place.strip()
+    e.entry_date = neues_datum
+    e.edited_at = utcnow()
+    if e.place != ort_vorher:
+        # Neuer Ortsname, alte Koordinaten passen nicht mehr dazu
+        e.lat = e.lon = None
+    db.add(e)
+    db.commit()
+    db.refresh(e)
+
+    if e.place and e.lat is None:
+        bg.add_task(_fill_entry_coords, e.id)
+    publish("entry", user.id)
+    return entries_out(db, [e], user)[0]
 
 
 @router.delete("/entries/{entry_id}")

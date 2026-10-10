@@ -17,18 +17,20 @@ export interface Upload {
 }
 
 /** Gemeinsame Logik für den Handy-Sheet und den Desktop-Schreibtisch. */
-export function useComposer(onPosted: (e: Entry) => void, autoLocation = false) {
-  const [kind, setKind] = useState<'short' | 'long'>('short')
-  const [title, setTitle] = useState('')
-  const [text, setText] = useState('')
-  const [mood, setMood] = useState('')
-  const [energy, setEnergy] = useState<number | null>(null)
-  const [place, setPlace] = useState('')
+/** `bearbeiten`: statt einen neuen Eintrag anzulegen, wird dieser geändert.
+ *  Fotos bleiben dabei unberührt. */
+export function useComposer(onPosted: (e: Entry) => void, autoLocation = false, bearbeiten: Entry | null = null) {
+  const [kind, setKind] = useState<'short' | 'long'>(bearbeiten?.kind ?? 'short')
+  const [title, setTitle] = useState(bearbeiten?.title ?? '')
+  const [text, setText] = useState(bearbeiten?.text ?? '')
+  const [mood, setMood] = useState(bearbeiten?.mood ?? '')
+  const [energy, setEnergy] = useState<number | null>(bearbeiten?.energy ?? null)
+  const [place, setPlace] = useState(bearbeiten?.place_name ?? '')
   const [locating, setLocating] = useState(false)
   // `auto` merkt sich, ob der Standort von allein kam oder bewusst geholt wurde
   const [coords, setCoords] = useState<{ lat: number; lon: number; auto: boolean } | null>(null)
   const [uploads, setUploads] = useState<Upload[]>([])
-  const [entryDate, setEntryDate] = useState<string | null>(null)
+  const [entryDate, setEntryDate] = useState<string | null>(bearbeiten?.date ?? null)
   const [dismissedDate, setDismissedDate] = useState<string | null>(null)
   const [posting, setPosting] = useState(false)
   const [gStatus, setGStatus] = useState<string | null>(null)
@@ -36,6 +38,7 @@ export function useComposer(onPosted: (e: Entry) => void, autoLocation = false) 
 
   // Entwurf überlebt das Schließen der App
   useEffect(() => {
+    if (bearbeiten) return // beim Ändern nicht den Entwurf eines neuen Eintrags überschreiben
     const saved = localStorage.getItem('draft')
     if (saved) {
       const d = JSON.parse(saved)
@@ -43,8 +46,9 @@ export function useComposer(onPosted: (e: Entry) => void, autoLocation = false) 
     }
   }, [])
   useEffect(() => {
+    if (bearbeiten) return
     localStorage.setItem('draft', JSON.stringify({ kind, title, text, mood, energy, place }))
-  }, [kind, title, text, mood, energy, place])
+  }, [bearbeiten, kind, title, text, mood, energy, place])
 
   const reset = () => {
     uploads.forEach((u) => u.preview.startsWith('blob:') && URL.revokeObjectURL(u.preview))
@@ -174,6 +178,19 @@ export function useComposer(onPosted: (e: Entry) => void, autoLocation = false) 
     const mitOrt = !!coords && (!coords.auto || ready.length > 0)
     setPosting(true)
     try {
+      if (bearbeiten) {
+        const geaendert = await api.patch<Entry>(`/api/entries/${bearbeiten.id}`, {
+          kind,
+          title: kind === 'long' ? title : '',
+          text,
+          mood,
+          energy,
+          place,
+          entry_date: entryDate,
+        })
+        onPosted(geaendert)
+        return true
+      }
       const entry = await api.post<Entry>('/api/entries', {
         kind,
         title: kind === 'long' ? title : '',
@@ -201,7 +218,7 @@ export function useComposer(onPosted: (e: Entry) => void, autoLocation = false) 
   }
 
   return {
-    kind, setKind, title, setTitle, text, setText, mood, setMood, energy, setEnergy, place, setPlace, locating, useStandort, coords, uploads, addFiles, remove, move,
+    bearbeitet: !!bearbeiten, kind, setKind, title, setTitle, text, setText, mood, setMood, energy, setEnergy, place, setPlace, locating, useStandort, coords, uploads, addFiles, remove, move,
     entryDate, setEntryDate, suggested, showSuggestion, dismissSuggestion: () => setDismissedDate(suggested),
     posting, canPost, isEmpty, post, gStatus, gConnected, connectGoogle, pickGoogle,
   }

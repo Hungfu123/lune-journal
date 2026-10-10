@@ -154,7 +154,7 @@ export function DateSuggestion({ c }: { c: Composer }) {
             onChange={(e) => c.setEntryDate(e.target.value && e.target.value !== heute ? e.target.value : null)}
           />
         </label>
-        {c.entryDate && (
+        {c.entryDate && !c.bearbeitet && (
           <button type="button" className="link-btn" onClick={() => c.setEntryDate(null)}>
             Zurück auf heute
           </button>

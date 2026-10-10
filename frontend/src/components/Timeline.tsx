@@ -58,6 +58,7 @@ export default function Timeline({ me, onMeChange }: { me: Me; onMeChange: (m: M
   const startWriting = () => (desktop ? composer.current?.focus() : setNewOpen(true))
   const [monthOpen, setMonthOpen] = useState(false)
   const [shared, setShared] = useState<SharedContent | null>(null)
+  const [bearbeiten, setBearbeiten] = useState<Entry | null>(null)
   const partner = me.partner?.name ?? 'Partner'
 
   /** `markNew`: Einträge, die seit dem letzten Laden dazugekommen sind, gleiten herein. */
@@ -304,7 +305,7 @@ export default function Timeline({ me, onMeChange }: { me: Me; onMeChange: (m: M
         )}
         {feed.map((item) =>
           item.kind === 'entry' ? (
-            <EntryCard key={`e${item.entry.id}`} entry={item.entry} fresh={freshIds.has(item.entry.id)} highlight={item.entry.id === highlightId} onHeart={heart} onDelete={remove} onOpenPhoto={(entry, index) => setLightbox({ photos: entry.photos, index, caption: `${entry.author.name}, ${dayLabel(entry.date)}`, entry })} />
+            <EntryCard key={`e${item.entry.id}`} entry={item.entry} fresh={freshIds.has(item.entry.id)} highlight={item.entry.id === highlightId} onHeart={heart} onDelete={remove} onEdit={setBearbeiten} onOpenPhoto={(entry, index) => setLightbox({ photos: entry.photos, index, caption: `${entry.author.name}, ${dayLabel(entry.date)}`, entry })} />
           ) : (
             <QACard key={`q${item.q.id}`} q={item.q} me={me} fresh={item.q.id === freshQ} />
           ),
@@ -354,6 +355,22 @@ export default function Timeline({ me, onMeChange }: { me: Me; onMeChange: (m: M
         </Suspense>
       )}
       {!desktop && <NewEntrySheet open={newOpen} onOpenChange={setNewOpen} onPosted={posted} shared={shared} askPlace={me.ask_place} autoLocation={me.auto_location} />}
+      {/* Eigenes Sheet mit eigenem Zustand: key sorgt dafür, dass die Felder
+          beim Wechsel auf einen anderen Eintrag neu gefüllt werden. */}
+      {bearbeiten && (
+        <NewEntrySheet
+          key={`edit-${bearbeiten.id}`}
+          open
+          onOpenChange={(o) => !o && setBearbeiten(null)}
+          onPosted={(e) => {
+            setEntries((liste) => (liste ?? []).map((x) => (x.id === e.id ? e : x)))
+            setBearbeiten(null)
+            toast('Gespeichert')
+          }}
+          askPlace={me.ask_place}
+          bearbeiten={bearbeiten}
+        />
+      )}
       {lightbox && (
         <Lightbox photos={lightbox.photos} start={lightbox.index} caption={lightbox.caption} entry={lightbox.entry} onClose={() => setLightbox(null)} />
       )}

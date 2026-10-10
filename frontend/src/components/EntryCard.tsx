@@ -13,6 +13,7 @@ interface Props {
   highlight?: boolean
   onHeart: (e: Entry) => void
   onDelete: (e: Entry) => void
+  onEdit?: (e: Entry) => void
   onOpenPhoto?: (e: Entry, index: number) => void
 }
 
@@ -54,7 +55,7 @@ function Photos({ photos, onOpen }: { photos: Entry['photos']; onOpen?: (i: numb
   )
 }
 
-export default function EntryCard({ entry, fresh, highlight, onHeart, onDelete, onOpenPhoto }: Props) {
+export default function EntryCard({ entry, fresh, highlight, onHeart, onDelete, onEdit, onOpenPhoto }: Props) {
   const direction = useSheetDirection()
   const [expanded, setExpanded] = useState(false)
   const [menu, setMenu] = useState(false)
@@ -72,7 +73,10 @@ export default function EntryCard({ entry, fresh, highlight, onHeart, onDelete, 
         <span className="avatar" aria-hidden="true">{entry.author.name.charAt(0)}</span>
         <div className="card-meta">
           <strong>{entry.author.name}</strong>
-          <span>{dayLabel(entry.date)}</span>
+          <span>
+            {dayLabel(entry.date)}
+            {entry.edited && <i className="bearbeitet-hinweis">bearbeitet</i>}
+          </span>
         </div>
         {entry.mood && (
           <span className="mood-tag" data-mood={entry.mood}>
@@ -149,6 +153,18 @@ export default function EntryCard({ entry, fresh, highlight, onHeart, onDelete, 
           <Drawer.Content className="sheet sheet-small" aria-describedby={undefined}>
             <Drawer.Handle className="sheet-handle" preventCycle />
             <Drawer.Title className="sheet-title">Eintrag vom {dayLabel(entry.date)}</Drawer.Title>
+            {onEdit && (
+              <button
+                type="button"
+                className="btn-secondary menu-aktion"
+                onClick={() => {
+                  setMenu(false)
+                  onEdit(entry)
+                }}
+              >
+                Bearbeiten
+              </button>
+            )}
             <HoldToDelete
               onConfirm={() => {
                 setMenu(false)

@@ -44,6 +44,7 @@ class Entry(SQLModel, table=True):
     place: str = ""  # selbst eingetragen; Fotos liefern ihren Ort weiterhin selbst
     lat: Optional[float] = None  # nur wenn der Standort bewusst mitgegeben wurde
     lon: Optional[float] = None
+    edited_at: Optional[datetime] = None  # gesetzt, sobald jemand nachträglich ändert
     created_at: datetime = Field(default_factory=utcnow)
 
 
