@@ -1,12 +1,14 @@
 # Lune Journal
 
-Ein privates Tagebuch für zwei. Kein Feed, keine Likes von Fremden, keine Werbung — nur ihr beide,
-eure Tage und eure Fotos. Die App läuft auf einem eigenen Server unter
-[lune-journal.duckdns.org](https://lune-journal.duckdns.org) und lässt genau zwei Google-Konten herein.
+Ein Tagebuch für zwei Personen. Ich habe es gebaut, weil wir unsere Einträge und Fotos nicht auf
+die Plattform von irgendwemandem laden wollten: kein Feed, keine Likes von Fremden, keine Werbung.
+Die App läuft auf einem eigenen Server unter
+[lune-journal.duckdns.org](https://lune-journal.duckdns.org) und lässt genau zwei Google-Konten
+rein — die Adressen stehen in der `.env`, alle anderen bekommen eine freundliche Absage.
 
-Auf dem Handy installiert ihr sie wie eine echte App (PWA), auf dem Laptop bekommt ihr einen
-Schreibtisch mit Seitenleiste. Am Jahresende macht die App aus allem ein Buch als PDF — zum Durchblättern
-oder zum Drucken.
+Auf dem Handy installiert ihr sie wie eine normale App (PWA), auf dem Laptop gibt es einen
+Schreibtisch mit Seitenleiste. Am Jahresende macht die App aus allen Einträgen ein Buch als PDF —
+ursprünglich der Grund, überhaupt anzufangen.
 
 <p align="center">
   <img src="docs/screenshots/handy-timeline.png" width="260" alt="Timeline auf dem Handy">
@@ -17,57 +19,45 @@ oder zum Drucken.
 > Alle Screenshots zeigen Demo-Daten: erfundene Texte und abstrakte Platzhalter-Bilder.
 > Echte Einträge und Fotos liegen nur auf dem Server und nie im Repo.
 
-## Was ihr damit machen könnt
+## Was drin ist
 
-**Den Tag festhalten.** Entweder *Kurz & knapp* (ein Satz) oder *Tag erzählen* (so lang ihr wollt),
-dazu eine Stimmung und beliebig viele Fotos aus Kamera, Galerie oder Google Fotos. Die App liest
-Aufnahmezeit und Ort aus den Foto-Metadaten und fragt nach: „Eintrag für diesen Tag anlegen?" Der Tag
-steht beim Schreiben immer sichtbar da und lässt sich mit einem Tipp ändern — so könnt ihr auch später
-nachtragen, und Timeline, Monatsübersicht und Karte sortieren danach.
+**Schreiben.** Kurz & knapp (ein Satz) oder Tag erzählen (so viel ihr wollt), dazu Stimmung und
+Energielevel von 1 bis 10, beides freiwillig. Fotos aus Kamera, Galerie oder Google Fotos. Hat ein
+Foto Aufnahmezeit und Ort in den Metadaten, fragt die App, ob der Eintrag auf diesen Tag soll —
+nachtragen geht also auch Wochen später, und Timeline, Monatsübersicht und Karte sortieren danach.
 
-**Einander Fragen stellen.** Eine Person fragt, die andere antwortet. Mit „Wir antworten beide" bleiben
-die Antworten verdeckt, bis beide fertig sind — niemand schreibt vom anderen ab. Beantwortete Fragen
-landen in der Timeline. Wer keine Idee hat, lässt sich eine vorschlagen.
+**Fragen.** Einer stellt, der andere antwortet. Mit „Wir antworten beide" bleiben die Antworten
+verdeckt, bis beide fertig sind — sonst schaut man doch, was der andere geschrieben hat.
+Beantwortete Fragen landen mit in der Timeline.
 
-**Sich erinnern lassen.** Einmal pro Woche ein kleiner Anstoß aufs Handy, Tag und Uhrzeit stellt jeder
-für sich ein. Die Erinnerung fällt aus, wenn an dem Tag schon etwas geschrieben wurde.
+**Push.** Schreibt der andere etwas, klingelt das Handy — mit Foto in der Benachrichtigung und
+einem „Herz senden"-Knopf direkt darin. Hat man die App gerade offen, erscheint der Eintrag sofort,
+ohne neu zu laden. Zusätzlich einmal pro Woche eine kleine Erinnerung; Tag und Uhrzeit stellt jeder
+für sich, und sie bleibt aus, wenn an dem Tag schon etwas steht.
 
-**Mitbekommen, was der andere schreibt.** Push aufs Handy mit Foto in der Benachrichtigung und einem
-„Herz senden"-Knopf direkt darin. Und wer die App gerade offen hat, sieht den neuen Eintrag sofort —
-ohne die Seite neu zu laden.
+**Zurückblättern.** Timeline pro Monat, Filter nach Alle / Meine / Partner, Monatsübersicht mit
+Zufalls-Erinnerung. Auf dem Laptop dazu „Heute vor einem Jahr" und eine Fotowand.
 
-**Zurückblättern.** Timeline pro Monat, Filter nach *Alle / Meine / Partner*, Monatsübersicht mit
-Anzahl und einer Zufalls-Erinnerung. Auf dem großen Bildschirm zusätzlich „Heute vor einem Jahr",
-euer Monat in Zahlen und eine Fotowand.
+**Kommentare.** Unter jedem Eintrag, auch unter dem eigenen. Fotos groß tippen zeigt
+Aufnahmedaten und dieselben Kommentare.
 
-**Ein Buch daraus machen.** Zeitraum und Titel wählen, Design, A5 oder A4, Bildschirm- oder
-Druckqualität, optional 3 mm Beschnitt für die Druckerei. Mit Cover, Inhaltsverzeichnis, Monatsseiten,
-Fragen und Jahresrückblick. Fotos stehen vollständig drin, nichts wird zugeschnitten; Kommentare und
-Energielevel stehen beim jeweiligen Eintrag. Vorher durchblättern, dann teilen oder drucken.
+**Karte.** Alles, was einen Ort hat: Fotos mit Koordinaten und Einträge mit Standort oder
+eingetipptem Ort. Was dicht beieinander liegt, wird zu einem Punkt mit Anzahl, Antippen zoomt
+rein, ein einzelner Punkt führt zum Eintrag. Orte kriegen Spitznamen — bei uns steht „Zuhause" da
+und nicht die Straße.
 
-**Standort nur, wenn er passt.** Hängen Fotos am Eintrag, holt die App auf Wunsch einmal euren Standort —
-praktisch, weil geteilte Fotos ihre Koordinaten oft verlieren. Ein Eintrag aus reinem Text bleibt unberührt.
-Orte lassen sich mit Spitznamen versehen: dann steht dort „Zuhause" statt der Straße.
+**Fotos von überall.** Lune Journal steht im Teilen-Menü des Pixel: Bilder in Google Fotos,
+WhatsApp oder der Galerie markieren, Teilen → Lune Journal. Der Eintrag geht auf, die Fotos hängen
+schon dran.
 
-**Fotos aus jeder App hereinreichen.** Lune Journal steht im Teilen-Menü eurer Pixel: in Google Fotos
-(auch in einem gemeinsamen Album), WhatsApp oder der Galerie die Bilder markieren, *Teilen* → *Lune Journal*.
-Der Eintrag geht auf, die Fotos hängen schon dran. Dafür muss die App auf dem Handy installiert sein.
+**Das Buch.** Zeitraum und Titel wählen, Design, A5 oder A4, Bildschirm- oder Druckqualität,
+optional 3 mm Beschnitt für die Druckerei. Cover, Inhaltsverzeichnis, Monatsseiten, Fragen und
+Jahresrückblick sind drin. Fotos werden nicht zugeschnitten — bewusst nur auf dem Cover und in
+der Monats-Collage, weil ich geschnittene Erinnerungsfotos nicht leiden kann. Vorher
+durchblättern, dann teilen oder drucken.
 
-**Miteinander reden.** Unter jedem Eintrag könnt ihr kommentieren, auch unter eigenen. Die Anzahl steht
-am Knopf, Antippen klappt sie auf. Tippt ihr ein Foto groß, stehen dort auch die Aufnahmedaten —
-Zeitpunkt, Ort, Größe — und dieselben Kommentare.
-
-**Eure Orte auf einer Karte.** Das Kartensymbol oben zeigt alles, was einen Ort hat — Fotos mit
-Koordinaten und Einträge, bei denen ihr den Standort mitgegeben oder den Ort selbst eingetippt habt.
-Beim Öffnen passt sich der Ausschnitt so an, dass alle Punkte hineinpassen. Was dicht beieinander liegt,
-wird zu einem Punkt mit Anzahl; Antippen zoomt hinein, ein einzelner Punkt führt zum Eintrag.
-Filtern könnt ihr nach Person, Jahr und Monat, „Alle zeigen" holt den Ausschnitt zurück.
-
-**Stimmung und Energie.** Zur Stimmung (müde / okay / gut / super) kommt ein Energielevel von 1 bis 10,
-beides freiwillig und beides direkt auf der Karte ablesbar.
-
-**Es euch schön machen.** Elf Designs, jedes mit eigener Überschrift-Schrift. Jeder stellt sein eigenes
-ein — ihr müsst euch nicht einigen.
+**Elf Designs**, jedes mit eigener Überschriften-Schrift. Jeder wählt seins selbst — wir mussten
+uns nie einigen.
 
 <p align="center">
   <img src="docs/screenshots/handy-kommentare.png" width="260" alt="Kommentare unter einem Eintrag">
@@ -81,25 +71,26 @@ ein — ihr müsst euch nicht einigen.
 
 ### Auf dem Laptop
 
-Ab 960 px Breite wird aus der Handy-App ein Schreibtisch: Seitenleiste mit Monatskalender und Filter,
-Eintrag direkt über der Timeline tippen, Fotos irgendwo ins Fenster ziehen oder mit <kbd>Strg</kbd>+<kbd>V</kbd>
-einfügen, per Ziehen sortieren, <kbd>Strg</kbd>+<kbd>Enter</kbd> postet. <kbd>N</kbd> neuer Eintrag,
-<kbd>B</kbd> Buch, <kbd>←</kbd> <kbd>→</kbd> Monat. Für lange Texte gibt es einen Fokus-Modus mit Wortzahl.
+Ab 960 px Breite wird aus der Handy-App ein Schreibtisch: Seitenleiste mit Monatskalender und
+Filter, Eintrag direkt über der Timeline tippen, Fotos irgendwo ins Fenster ziehen oder mit
+<kbd>Strg</kbd>+<kbd>V</kbd> einfügen, per Ziehen sortieren, <kbd>Strg</kbd>+<kbd>Enter</kbd>
+postet. <kbd>N</kbd> neuer Eintrag, <kbd>B</kbd> Buch, <kbd>←</kbd> <kbd>→</kbd> Monat. Für lange
+Texte gibt es einen Fokus-Modus mit Wortzahl.
 
 ![Schreibtisch auf dem Laptop](docs/screenshots/desktop-schreibtisch.png)
 
 ## Wie privat ist das?
 
 - Rein kommt nur, wer sich mit einer der zwei Adressen aus `ALLOWED_EMAILS` bei Google anmeldet.
-  Jeder andere bekommt eine freundliche Absage.
-- Fotos liegen **nicht** in einem öffentlichen Ordner. Caddy fragt vor jeder Bilddatei beim Backend
-  nach, ob die Sitzung gültig ist (`forward_auth`).
-- Die ausgelieferten Bilder sind WebP ohne EXIF — kein GPS, kein Gerätename. Die Originale bleiben
+- Fotos liegen in keinem öffentlichen Ordner. Caddy fragt vor jeder Bilddatei beim Backend nach,
+  ob die Sitzung gültig ist (`forward_auth`).
+- Ausgelieferte Bilder sind WebP ohne EXIF — kein GPS, kein Gerätename. Die Originale bleiben
   für den Druck auf dem Server.
 - Bilder in Push-Benachrichtigungen laufen über signierte Links, die nach kurzer Zeit ablaufen.
 - Die Seite sagt Suchmaschinen per `X-Robots-Tag`, dass sie nichts zu suchen haben.
-- Eine Ausnahme: die Kartenansicht lädt Kacheln von OpenStreetMap. Deren Server sieht dabei, welchen
-  Ausschnitt ihr anschaut — nicht eure Fotos, aber die Gegend. Wer das nicht möchte, lässt die Karte zu.
+- Eine Ausnahme: die Karte lädt Kacheln von OpenStreetMap. Deren Server sieht dabei, welchen
+  Ausschnitt ihr anschaut — nicht eure Fotos, aber die Gegend. Wer das nicht möchte, lässt die
+  Karte zu.
 - Backups auf die Hetzner Storage Box sind mit restic verschlüsselt.
 
 ## Wie es gebaut ist
@@ -113,8 +104,8 @@ einfügen, per Ziehen sortieren, <kbd>Strg</kbd>+<kbd>Enter</kbd> postet. <kbd>N
 | Auslieferung | Caddy: App, `/api` → FastAPI, `/media` mit `forward_auth` |
 | Server | Hetzner VPS, Docker Compose, hinter dem Nginx der Softball-App (TLS) |
 
-Styles stehen ohne Framework in `frontend/src/theme.css`, pro Design ein Satz CSS-Variablen.
-Schriften sind selbst gehostet — die App ruft kein Google Fonts auf.
+Bewusst ohne Tailwind und ohne UI-Framework: Styles stehen in `frontend/src/theme.css`, pro
+Design ein Satz CSS-Variablen. Schriften sind selbst gehostet, die App ruft kein Google Fonts auf.
 
 ```
 backend/app/        FastAPI: routes/, models.py, images.py, push.py, book/ (PDF)
