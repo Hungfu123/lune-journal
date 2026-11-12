@@ -7,8 +7,7 @@ Die App läuft auf einem eigenen Server unter
 rein — die Adressen stehen in der `.env`, alle anderen bekommen eine freundliche Absage.
 
 Auf dem Handy installiert ihr sie wie eine normale App (PWA), auf dem Laptop gibt es einen
-Schreibtisch mit Seitenleiste. Am Jahresende macht die App aus allen Einträgen ein Buch als PDF —
-ursprünglich der Grund, überhaupt anzufangen.
+Schreibtisch mit Seitenleiste. Am Jahresende macht die App aus allen Einträgen ein Buch als PDF.
 
 <p align="center">
   <img src="docs/screenshots/handy-timeline.png" width="260" alt="Timeline auf dem Handy">
@@ -53,8 +52,7 @@ schon dran.
 **Das Buch.** Zeitraum und Titel wählen, Design, A5 oder A4, Bildschirm- oder Druckqualität,
 optional 3 mm Beschnitt für die Druckerei. Cover, Inhaltsverzeichnis, Monatsseiten, Fragen und
 Jahresrückblick sind drin. Fotos werden nicht zugeschnitten — bewusst nur auf dem Cover und in
-der Monats-Collage, weil ich geschnittene Erinnerungsfotos nicht leiden kann. Vorher
-durchblättern, dann teilen oder drucken.
+der Monats-Collage. Vorher durchblättern, dann teilen oder drucken.
 
 **Elf Designs**, jedes mit eigener Überschriften-Schrift. Jeder wählt seins selbst — wir mussten
 uns nie einigen.
